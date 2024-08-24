@@ -1,6 +1,7 @@
 'use client';
+
 import React, { useState } from 'react';
-import { Search, Star } from 'lucide-react';
+import { Search, Star, ExternalLink } from 'lucide-react';
 
 const MovieSearch = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,18 +43,28 @@ const MovieSearch = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {searchResults.map((movie: any) => (
           <div key={movie.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-            <img 
-              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
-              alt={movie.title} 
-              className="w-full h-64 object-cover"
-            />
+            <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="block hover:opacity-75 transition-opacity">
+              <img 
+                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
+                alt={movie.title} 
+                className="w-full h-64 object-cover"
+              />
+            </a>
             <div className="p-4">
-              <h2 className="text-xl font-bold mb-2">{movie.title}</h2>
+              <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="block hover:underline">
+                <h2 className="text-xl font-bold mb-2">{movie.title}</h2>
+              </a>
               <p className="text-sm text-gray-600 mb-2">Released: {movie.release_date}</p>
               <p className="text-sm mb-2">{movie.overview}</p>
-              <div className="flex items-center mb-2">
-                <Star className="w-5 h-5 text-yellow-400 mr-1" />
-                <span>{movie.vote_average.toFixed(1)}</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Star className="w-5 h-5 text-yellow-400 mr-1" />
+                  <span>{movie.vote_average.toFixed(1)}</span>
+                </div>
+                <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex items-center">
+                  View on TMDb
+                  <ExternalLink className="w-4 h-4 ml-1" />
+                </a>
               </div>
             </div>
           </div>
