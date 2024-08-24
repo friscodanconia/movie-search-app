@@ -53,20 +53,20 @@ const MovieSearch: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-8 text-center">Enter movie name</h1>
+    <div className="max-w-4xl mx-auto p-4 bg-cinema-dark">
+      <h1 className="text-3xl font-bold mb-8 text-center text-cinema-gold">Enter movie name</h1>
       <form onSubmit={handleSearch} className="mb-8">
         <div className="relative">
           <input
             type="text"
             placeholder="Search for a movie..."
-            className="w-full px-4 py-2 pr-10 text-gray-700 bg-white border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 pr-10 text-cinema-text bg-gray-800 border border-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-cinema-gold"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <div
             onClick={() => handleSearch()}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-900 cursor-pointer"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-cinema-gold hover:text-yellow-300 cursor-pointer"
           >
             <Search className="w-6 h-6" />
           </div>
@@ -74,7 +74,7 @@ const MovieSearch: React.FC = () => {
       </form>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {searchResults.map((movie) => (
-          <div key={movie.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div key={movie.id} className="bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-700">
             <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="block hover:opacity-75 transition-opacity">
               {movie.poster_path && (
                 <Image 
@@ -88,16 +88,16 @@ const MovieSearch: React.FC = () => {
             </a>
             <div className="p-4">
               <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="block hover:underline">
-                <h2 className="text-xl font-bold mb-2">{movie.title}</h2>
+                <h2 className="text-xl font-bold mb-2 text-cinema-gold">{movie.title}</h2>
               </a>
-              <p className="text-sm text-gray-600 mb-2">Released: {movie.release_date}</p>
+              <p className="text-sm text-gray-400 mb-2">Released: {movie.release_date}</p>
               <p className="text-sm mb-2">{movie.overview}</p>
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <Star className="w-5 h-5 text-yellow-400 mr-1" />
+                  <Star className="w-5 h-5 text-cinema-gold mr-1" />
                   <span>{movie.vote_average.toFixed(1)} ({movie.vote_count} votes)</span>
                 </div>
-                <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex items-center">
+                <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="text-cinema-gold hover:underline flex items-center">
                   View on TMDb
                   <ExternalLink className="w-4 h-4 ml-1" />
                 </a>

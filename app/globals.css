@@ -31,3 +31,8 @@ body {
     text-wrap: balance;
   }
 }
+@layer base {
+  body {
+    @apply bg-cinema-dark text-cinema-text;
+  }
+}
