@@ -14,7 +14,7 @@ interface Movie {
   vote_count: number;
 }
 
-const MovieSearch = () => {
+const MovieSearch: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Movie[]>([]);
 
@@ -62,3 +62,52 @@ const MovieSearch = () => {
             placeholder="Search for a movie..."
             className="w-full px-4 py-2 pr-10 text-gray-700 bg-white border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <div
+            onClick={() => handleSearch()}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-900 cursor-pointer"
+          >
+            <Search className="w-6 h-6" />
+          </div>
+        </div>
+      </form>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {searchResults.map((movie) => (
+          <div key={movie.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+            <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="block hover:opacity-75 transition-opacity">
+              {movie.poster_path && (
+                <Image 
+                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                  alt={movie.title}
+                  width={500}
+                  height={750}
+                  className="w-full h-64 object-cover"
+                />
+              )}
+            </a>
+            <div className="p-4">
+              <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="block hover:underline">
+                <h2 className="text-xl font-bold mb-2">{movie.title}</h2>
+              </a>
+              <p className="text-sm text-gray-600 mb-2">Released: {movie.release_date}</p>
+              <p className="text-sm mb-2">{movie.overview}</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Star className="w-5 h-5 text-yellow-400 mr-1" />
+                  <span>{movie.vote_average.toFixed(1)} ({movie.vote_count} votes)</span>
+                </div>
+                <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex items-center">
+                  View on TMDb
+                  <ExternalLink className="w-4 h-4 ml-1" />
+                </a>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default MovieSearch;
