@@ -15,10 +15,42 @@ const MovieSearch = () => {
         `https://api.themoviedb.org/3/search/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${searchTerm}`
       );
       const data = await response.json();
-      setSearchResults(data.results);
+      const sortedResults = sortMovies(data.results);
+      setSearchResults(sortedResults);
     } catch (error) {
       console.error('Error searching movies:', error);
     }
+  };
+
+  const sortMovies = (movies: any[]) => {
+    return movies.sort((a, b) => {
+      // Calculate a score for each movie
+      const scoreA = calculateMovieScore(a);
+      const scoreB = calculateMovieScore(b);
+      
+      // Sort in descending order of score
+      return scoreB - scoreA;
+    });
+  };
+
+  const calculateMovieScore = (movie: any) => {
+    let score = 0;
+    
+    // Weight for vote average (0-10 scale)
+    score += movie.vote_average * 10;
+    
+    // Weight for vote count (logarithmic scale to prevent extremes)
+    score += Math.log(movie.vote_count + 1) * 20;
+    
+    // Bonus for movies with a poster
+    if (movie.poster_path) score += 50;
+    
+    // Slight boost for more recent movies
+    const currentYear = new Date().getFullYear();
+    const movieYear = new Date(movie.release_date).getFullYear();
+    score += Math.max(0, 10 - (currentYear - movieYear)); // Max 10 point boost for current year
+
+    return score;
   };
 
   return (
@@ -60,7 +92,7 @@ const MovieSearch = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <Star className="w-5 h-5 text-yellow-400 mr-1" />
-                  <span>{movie.vote_average.toFixed(1)}</span>
+                  <span>{movie.vote_average.toFixed(1)} ({movie.vote_count} votes)</span>
                 </div>
                 <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex items-center">
                   View on TMDb
