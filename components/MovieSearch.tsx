@@ -7,8 +7,9 @@ const MovieSearch = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!searchTerm.trim()) return;
     try {
       const response = await fetch(
         `https://api.themoviedb.org/3/search/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${searchTerm}`
@@ -32,12 +33,12 @@ const MovieSearch = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button
-            type="submit"
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-900"
+          <div
+            onClick={() => handleSearch()}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-900 cursor-pointer"
           >
             <Search className="w-6 h-6" />
-          </button>
+          </div>
         </div>
       </form>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
