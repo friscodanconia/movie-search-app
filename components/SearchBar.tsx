@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Search } from 'lucide-react';
 import debounce from 'lodash.debounce';
 
@@ -42,7 +42,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
         console.error('Error fetching suggestions:', error);
       }
     }, 300),
-    []
+    [] // Empty dependency array
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
