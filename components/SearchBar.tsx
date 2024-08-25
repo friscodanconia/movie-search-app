@@ -1,11 +1,13 @@
 import React, { useState, useCallback } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Film, User } from 'lucide-react';
 import debounce from 'lodash.debounce';
 
 interface SearchSuggestion {
   id: number;
   title: string;
   media_type: string;
+  year?: string;
+  character?: string;
 }
 
 interface SearchBarProps {
@@ -36,13 +38,18 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
             id: item.id,
             title: item.title || item.name,
             media_type: item.media_type,
+            year: item.release_date ? new Date(item.release_date).getFullYear().toString() : 
+                  (item.known_for && item.known_for[0]?.release_date ? 
+                    new Date(item.known_for[0].release_date).getFullYear().toString() : undefined),
+            character: item.media_type === 'person' && item.known_for && item.known_for[0]?.title ? 
+                       item.known_for[0].title : undefined
           }));
         setSuggestions(filteredSuggestions);
       } catch (error) {
         console.error('Error fetching suggestions:', error);
       }
     }, 300),
-    [] // Empty dependency array
+    []
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,10 +98,24 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
           {suggestions.map((suggestion) => (
             <li
               key={suggestion.id}
-              className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-cinema-text"
+              className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-cinema-text flex items-center"
               onClick={() => handleSuggestionClick(suggestion)}
             >
-              {suggestion.title} ({suggestion.media_type})
+              {suggestion.media_type === 'movie' ? (
+                <Film className="w-4 h-4 mr-2 text-cinema-gold" />
+              ) : (
+                <User className="w-4 h-4 mr-2 text-cinema-gold" />
+              )}
+              <div>
+                <div className="font-semibold">{suggestion.title}</div>
+                <div className="text-xs text-gray-400">
+                  {suggestion.media_type === 'movie' ? (
+                    suggestion.year
+                  ) : (
+                    suggestion.character ? `Known for: ${suggestion.character}` : 'Actor/Actress'
+                  )}
+                </div>
+              </div>
             </li>
           ))}
         </ul>
