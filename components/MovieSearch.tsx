@@ -142,6 +142,6 @@ const MovieSearch: React.FC = () => {
   ))}
 </div>
   );
-};
+{'}'};
 
 export default MovieSearch;
