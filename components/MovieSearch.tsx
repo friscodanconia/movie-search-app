@@ -8,10 +8,10 @@ interface Movie {
   id: number;
   title: string;
   poster_path: string | null;
-  release_date: string;
-  overview: string;
-  vote_average: number;
-  vote_count: number;
+  release_date?: string;
+  overview?: string;
+  vote_average?: number;
+  vote_count?: number;
   media_type: 'movie';
 }
 
@@ -44,6 +44,7 @@ const MovieSearch: React.FC = () => {
       console.error('Error searching:', error);
     }
   };
+
   const processSearchResults = (results: SearchResult[]): Movie[] => {
     const processedResults: Movie[] = [];
     
@@ -62,7 +63,7 @@ const MovieSearch: React.FC = () => {
         });
       }
     });
-  
+
     return sortMovies(processedResults);
   };
 
@@ -73,7 +74,7 @@ const MovieSearch: React.FC = () => {
       return scoreB - scoreA;
     });
   };
-  
+
   const calculateMovieScore = (movie: Movie): number => {
     let score = 0;
     score += (movie.vote_average || 0) * 10;
@@ -87,12 +88,12 @@ const MovieSearch: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-4 bg-cinema-dark">
-      <h1 className="text-3xl font-bold mb-8 text-center text-cinema-gold">Enter movie name</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center text-cinema-gold">Enter movie name or actor</h1>
       <form onSubmit={handleSearch} className="mb-8">
         <div className="relative">
           <input
             type="text"
-            placeholder="Search for a movie..."
+            placeholder="Search for a movie or actor..."
             className="w-full px-4 py-2 pr-10 text-cinema-text bg-gray-800 border border-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-cinema-gold"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -106,42 +107,43 @@ const MovieSearch: React.FC = () => {
         </div>
       </form>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-  {searchResults.map((movie) => (
-    <div key={movie.id} className="bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-700">
-      <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="block hover:opacity-75 transition-opacity">
-        {movie.poster_path && (
-          <Image 
-            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-            alt={movie.title}
-            width={500}
-            height={750}
-            className="w-full h-64 object-cover"
-          />
-        )}
-      </a>
-      <div className="p-4">
-        <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="block hover:underline">
-          <h2 className="text-xl font-bold mb-2 text-cinema-gold">{movie.title}</h2>
-        </a>
-        {movie.release_date && (
-          <p className="text-sm text-gray-400 mb-2">Released: {movie.release_date}</p>
-        )}
-        <p className="text-sm mb-2">{movie.overview}</p>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <Star className="w-5 h-5 text-cinema-gold mr-1" />
-            <span>{movie.vote_average?.toFixed(1) || 'N/A'} ({movie.vote_count || 0} votes)</span>
+        {searchResults.map((movie) => (
+          <div key={movie.id} className="bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-700">
+            <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="block hover:opacity-75 transition-opacity">
+              {movie.poster_path && (
+                <Image 
+                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                  alt={movie.title}
+                  width={500}
+                  height={750}
+                  className="w-full h-64 object-cover"
+                />
+              )}
+            </a>
+            <div className="p-4">
+              <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="block hover:underline">
+                <h2 className="text-xl font-bold mb-2 text-cinema-gold">{movie.title}</h2>
+              </a>
+              {movie.release_date && (
+                <p className="text-sm text-gray-400 mb-2">Released: {movie.release_date}</p>
+              )}
+              <p className="text-sm mb-2">{movie.overview}</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Star className="w-5 h-5 text-cinema-gold mr-1" />
+                  <span>{movie.vote_average?.toFixed(1) || 'N/A'} ({movie.vote_count || 0} votes)</span>
+                </div>
+                <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="text-cinema-gold hover:underline flex items-center">
+                  View on TMDb
+                  <ExternalLink className="w-4 h-4 ml-1" />
+                </a>
+              </div>
+            </div>
           </div>
-          <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="text-cinema-gold hover:underline flex items-center">
-            View on TMDb
-            <ExternalLink className="w-4 h-4 ml-1" />
-          </a>
-        </div>
+        ))}
       </div>
     </div>
-  ))}
-</div>
   );
-{'}'};
+};
 
 export default MovieSearch;
