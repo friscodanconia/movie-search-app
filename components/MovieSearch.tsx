@@ -88,12 +88,13 @@ const MovieSearch: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-4 bg-cinema-dark">
-      <h1 className="text-3xl font-bold mb-8 text-center text-cinema-gold">Enter movie name or actor</h1>
+      <h1 className="text-4xl font-bold mb-2 text-center text-cinema-gold">CineMagic</h1>
+      <p className="text-lg mb-8 text-center text-cinema-text">Search for movies or people</p>
       <form onSubmit={handleSearch} className="mb-8">
         <div className="relative">
           <input
             type="text"
-            placeholder="Search for a movie or actor..."
+            placeholder="Search for a movie or person..."
             className="w-full px-4 py-2 pr-10 text-cinema-text bg-gray-800 border border-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-cinema-gold"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
