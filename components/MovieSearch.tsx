@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Search, Star, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface Movie {
   id: number;
@@ -27,8 +28,15 @@ interface Person {
 type SearchResult = Movie | Person;
 
 const MovieSearch: React.FC = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Movie[]>([]);
+
+  const handleLogoClick = () => {
+    setSearchTerm('');
+    setSearchResults([]);
+    router.refresh();
+  };
 
   const handleSearch = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -88,7 +96,12 @@ const MovieSearch: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-4 bg-cinema-dark">
-      <h1 className="text-4xl font-bold mb-2 text-center text-cinema-gold">CineMagic</h1>
+      <h1 
+        className="text-4xl font-bold mb-2 text-center text-cinema-gold cursor-pointer hover:text-yellow-300 transition-colors"
+        onClick={handleLogoClick}
+      >
+        CineMagic
+      </h1>
       <p className="text-lg mb-8 text-center text-cinema-text">Search for movies or people</p>
       <form onSubmit={handleSearch} className="mb-8">
         <div className="relative">
