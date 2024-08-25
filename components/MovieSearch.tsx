@@ -12,7 +12,19 @@ interface Movie {
   overview: string;
   vote_average: number;
   vote_count: number;
+  media_type: 'movie';
 }
+
+interface Person {
+  id: number;
+  name: string;
+  profile_path: string | null;
+  known_for_department: string;
+  known_for: Movie[];
+  media_type: 'person';
+}
+
+type SearchResult = Movie | Person;
 
 const MovieSearch: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,31 +35,52 @@ const MovieSearch: React.FC = () => {
     if (!searchTerm.trim()) return;
     try {
       const response = await fetch(
-        `https://api.themoviedb.org/3/search/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${searchTerm}`
+        `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${searchTerm}`
       );
       const data = await response.json();
-      const sortedResults = sortMovies(data.results);
-      setSearchResults(sortedResults);
+      const processedResults = processSearchResults(data.results);
+      setSearchResults(processedResults);
     } catch (error) {
-      console.error('Error searching movies:', error);
+      console.error('Error searching:', error);
     }
   };
+  const processSearchResults = (results: SearchResult[]): Movie[] => {
+    const processedResults: Movie[] = [];
+    
+    results.forEach(result => {
+      if (result.media_type === 'movie') {
+        processedResults.push(result as Movie);
+      } else if (result.media_type === 'person') {
+        const person = result as Person;
+        person.known_for.forEach(movie => {
+          if (movie.media_type === 'movie') {
+            processedResults.push({
+              ...movie,
+              title: `${movie.title} (featuring ${person.name})`,
+            });
+          }
+        });
+      }
+    });
+  
+    return sortMovies(processedResults);
+  };
 
-  const sortMovies = (movies: any[]): Movie[] => {
+  const sortMovies = (movies: Movie[]): Movie[] => {
     return movies.sort((a, b) => {
       const scoreA = calculateMovieScore(a);
       const scoreB = calculateMovieScore(b);
       return scoreB - scoreA;
     });
   };
-
+  
   const calculateMovieScore = (movie: Movie): number => {
     let score = 0;
-    score += movie.vote_average * 10;
-    score += Math.log(movie.vote_count + 1) * 20;
+    score += (movie.vote_average || 0) * 10;
+    score += Math.log((movie.vote_count || 0) + 1) * 20;
     if (movie.poster_path) score += 50;
     const currentYear = new Date().getFullYear();
-    const movieYear = new Date(movie.release_date).getFullYear();
+    const movieYear = movie.release_date ? new Date(movie.release_date).getFullYear() : currentYear;
     score += Math.max(0, 10 - (currentYear - movieYear));
     return score;
   };
@@ -73,40 +106,41 @@ const MovieSearch: React.FC = () => {
         </div>
       </form>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {searchResults.map((movie) => (
-          <div key={movie.id} className="bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-700">
-            <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="block hover:opacity-75 transition-opacity">
-              {movie.poster_path && (
-                <Image 
-                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                  alt={movie.title}
-                  width={500}
-                  height={750}
-                  className="w-full h-64 object-cover"
-                />
-              )}
-            </a>
-            <div className="p-4">
-              <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="block hover:underline">
-                <h2 className="text-xl font-bold mb-2 text-cinema-gold">{movie.title}</h2>
-              </a>
-              <p className="text-sm text-gray-400 mb-2">Released: {movie.release_date}</p>
-              <p className="text-sm mb-2">{movie.overview}</p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Star className="w-5 h-5 text-cinema-gold mr-1" />
-                  <span>{movie.vote_average.toFixed(1)} ({movie.vote_count} votes)</span>
-                </div>
-                <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="text-cinema-gold hover:underline flex items-center">
-                  View on TMDb
-                  <ExternalLink className="w-4 h-4 ml-1" />
-                </a>
-              </div>
-            </div>
+  {searchResults.map((movie) => (
+    <div key={movie.id} className="bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-700">
+      <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="block hover:opacity-75 transition-opacity">
+        {movie.poster_path && (
+          <Image 
+            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+            alt={movie.title}
+            width={500}
+            height={750}
+            className="w-full h-64 object-cover"
+          />
+        )}
+      </a>
+      <div className="p-4">
+        <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="block hover:underline">
+          <h2 className="text-xl font-bold mb-2 text-cinema-gold">{movie.title}</h2>
+        </a>
+        {movie.release_date && (
+          <p className="text-sm text-gray-400 mb-2">Released: {movie.release_date}</p>
+        )}
+        <p className="text-sm mb-2">{movie.overview}</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <Star className="w-5 h-5 text-cinema-gold mr-1" />
+            <span>{movie.vote_average?.toFixed(1) || 'N/A'} ({movie.vote_count || 0} votes)</span>
           </div>
-        ))}
+          <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="text-cinema-gold hover:underline flex items-center">
+            View on TMDb
+            <ExternalLink className="w-4 h-4 ml-1" />
+          </a>
+        </div>
       </div>
     </div>
+  ))}
+</div>
   );
 };
 
