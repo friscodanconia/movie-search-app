@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { Search, Star, ExternalLink, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import MovieDetail from './MovieDetail';
 
 interface Movie {
   id: number;
@@ -27,6 +26,45 @@ interface Person {
 }
 
 type SearchResult = Movie | Person;
+
+interface MovieDetailProps {
+  movie: Movie;
+  onClose: () => void;
+}
+
+const MovieDetail: React.FC<MovieDetailProps> = ({ movie, onClose }) => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+      <div className="bg-gray-800 rounded-lg max-w-2xl w-full overflow-y-auto max-h-full">
+        <div className="p-4 flex justify-between items-start">
+          <h2 className="text-2xl font-bold text-cinema-gold">{movie.title}</h2>
+          <button onClick={onClose} className="text-cinema-text hover:text-cinema-gold">
+            <X size={24} />
+          </button>
+        </div>
+        <div className="p-4">
+          {movie.poster_path && (
+            <Image
+              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+              alt={movie.title}
+              width={500}
+              height={750}
+              className="w-full h-auto rounded-lg mb-4"
+            />
+          )}
+          <p className="text-cinema-text mb-2">{movie.overview}</p>
+          <p className="text-cinema-text mb-2">Released: {movie.release_date}</p>
+          <div className="flex items-center">
+            <Star className="w-5 h-5 text-cinema-gold mr-1" />
+            <span className="text-cinema-text">
+              {movie.vote_average?.toFixed(1) || 'N/A'} ({movie.vote_count || 0} votes)
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const MovieSearch: React.FC = () => {
   const router = useRouter();
