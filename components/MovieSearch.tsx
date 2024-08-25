@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Star, ExternalLink, X } from 'lucide-react';
+import { Star, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import SearchBar from './SearchBar';
 
 interface Movie {
   id: number;
@@ -39,7 +40,7 @@ const MovieDetail: React.FC<MovieDetailProps> = ({ movie, onClose }) => {
         <div className="p-4 flex justify-between items-start">
           <h2 className="text-2xl font-bold text-cinema-gold">{movie.title}</h2>
           <button onClick={onClose} className="text-cinema-text hover:text-cinema-gold">
-            <X size={24} />
+            <ExternalLink size={24} />
           </button>
         </div>
         <div className="p-4">
@@ -87,16 +88,16 @@ const MovieSearch: React.FC = () => {
     router.refresh();
   };
 
-  const handleSearch = async (e?: React.FormEvent, page: number = 1) => {
-    e?.preventDefault();
-    if (!searchTerm.trim()) return;
+  const handleSearch = async (term: string, page: number = 1) => {
+    setSearchTerm(term);
+    if (!term.trim()) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
       const response = await fetch(
-        `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${searchTerm}&page=${page}`
+        `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${term}&page=${page}`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch results');
@@ -173,25 +174,7 @@ const MovieSearch: React.FC = () => {
         CineMagic
       </h1>
       <p className="text-lg mb-8 text-center text-cinema-text">Search for movies or people</p>
-      <form onSubmit={handleSearch} className="mb-8">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search for a movie or person..."
-            aria-label="Search for a movie or person"
-            className="w-full px-4 py-2 pr-10 text-cinema-text bg-gray-800 border border-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-cinema-gold"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button
-            onClick={() => handleSearch()}
-            aria-label="Search"
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-cinema-gold hover:text-yellow-300 cursor-pointer"
-          >
-            <Search className="w-6 h-6" />
-          </button>
-        </div>
-      </form>
+      <SearchBar onSearch={handleSearch} />
       {isLoading && <p className="text-center text-cinema-text">Loading...</p>}
       {error && <p className="text-center text-red-500">{error}</p>}
       {!isLoading && !error && visibleResults.length === 0 && searchTerm && (
@@ -240,7 +223,7 @@ const MovieSearch: React.FC = () => {
       {totalPages > 1 && (
         <div className="flex justify-center mt-4">
           <button
-            onClick={() => handleSearch(undefined, currentPage - 1)}
+            onClick={() => handleSearch(searchTerm, currentPage - 1)}
             disabled={currentPage === 1}
             className="px-4 py-2 bg-cinema-gold text-cinema-dark rounded-l-md disabled:opacity-50"
           >
@@ -250,7 +233,7 @@ const MovieSearch: React.FC = () => {
             {currentPage} of {totalPages}
           </span>
           <button
-            onClick={() => handleSearch(undefined, currentPage + 1)}
+            onClick={() => handleSearch(searchTerm, currentPage + 1)}
             disabled={currentPage === totalPages}
             className="px-4 py-2 bg-cinema-gold text-cinema-dark rounded-r-md disabled:opacity-50"
           >
