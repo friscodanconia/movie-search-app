@@ -30,6 +30,7 @@ type SearchResult = Movie | Person;
 
 interface MovieDetailProps {
   movie: Movie;
+  //commenting this out to push deployemnt
   onClose: () => void;
 }
 
