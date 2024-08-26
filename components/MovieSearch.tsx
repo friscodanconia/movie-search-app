@@ -30,7 +30,6 @@ type SearchResult = Movie | Person;
 
 interface MovieDetailProps {
   movie: Movie;
-  //commenting this out to push deployemnt
   onClose: () => void;
 }
 
@@ -175,7 +174,7 @@ const MovieSearch: React.FC = () => {
         CineMagic
       </h1>
       <p className="text-lg mb-8 text-center text-cinema-text">Search for movies or people</p>
-      <SearchBar onSearch={handleSearch} />
+      <SearchBar onSearch={handleSearch} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       {isLoading && <p className="text-center text-cinema-text">Loading...</p>}
       {error && <p className="text-center text-red-500">{error}</p>}
       {!isLoading && !error && visibleResults.length === 0 && searchTerm && (
