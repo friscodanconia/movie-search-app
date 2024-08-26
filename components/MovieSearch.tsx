@@ -168,27 +168,28 @@ const MovieSearch: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto p-4 bg-cinema-dark">
       <h1 
-        className="text-4xl font-bold mb-2 text-center text-cinema-gold cursor-pointer hover:text-yellow-300 transition-colors"
-        onClick={handleLogoClick}
-      >
-        CineMagic
-      </h1>
-      <p className="text-lg mb-8 text-center text-cinema-text">Search for movies or people</p>
-      <SearchBar onSearch={handleSearch} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      {isLoading && <p className="text-center text-cinema-text">Loading...</p>}
-      {error && <p className="text-center text-red-500">{error}</p>}
-      {!isLoading && !error && visibleResults.length === 0 && searchTerm && (
-        <p className="text-center text-cinema-text">No results found</p>
-      )}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {visibleResults.map((movie) => (
-          <div 
-            key={movie.id} 
-            className="bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-700 cursor-pointer"
-            onClick={() => setSelectedMovie(movie)}
-            role="button"
-            aria-label={`View details for ${movie.title}`}
-            tabIndex={0}
+  className="text-4xl font-bold mb-2 text-center text-cinema-gold cursor-pointer hover:text-yellow-300 transition-colors relative group"
+  onClick={handleLogoClick}
+>
+  CineMagic
+  <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-yellow-300 group-hover:w-full transition-all duration-300 ease-out"></span>
+</h1>
+<p className="text-lg mb-8 text-center text-cinema-text">Search for movies or people</p>
+<SearchBar onSearch={handleSearch} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+{isLoading && <p className="text-center text-cinema-text">Loading...</p>}
+{error && <p className="text-center text-red-500">{error}</p>}
+{!isLoading && !error && visibleResults.length === 0 && searchTerm && (
+  <p className="text-center text-cinema-text">No results found</p>
+)}
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  {visibleResults.map((movie) => (
+    <div 
+      key={movie.id} 
+      className="bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-700 cursor-pointer"
+      onClick={() => setSelectedMovie(movie)}
+      role="button"
+      aria-label={`View details for ${movie.title}`}
+      tabIndex={0}
           >
             {movie.poster_path && (
               <Image 

@@ -114,17 +114,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm, setSearchTe
     <div className="relative w-full max-w-2xl mx-auto">
       <form onSubmit={handleSubmit} className="mb-8">
         <div className="relative">
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder="Search for a movie or person..."
-            aria-label="Search for a movie or person"
-            className="w-full px-4 py-3 pr-10 text-cinema-text bg-gray-800 border border-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-cinema-gold text-lg"
-            value={searchTerm}
-            onChange={handleInputChange}
-            onFocus={() => setShowSuggestions(true)}
-            onKeyDown={handleKeyDown}
-          />
+        <input
+  ref={inputRef}
+  type="text"
+  placeholder="Search for a movie or person..."
+  aria-label="Search for a movie or person"
+  className="w-full px-4 py-3 pr-10 text-cinema-text bg-gray-800 border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-cinema-gold text-lg shadow-md focus:shadow-lg transition-shadow duration-300"
+  value={searchTerm}
+  onChange={handleInputChange}
+  onFocus={() => setShowSuggestions(true)}
+  onKeyDown={handleKeyDown}
+/>
           <button
             type="submit"
             aria-label="Search"
