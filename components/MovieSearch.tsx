@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Star, ExternalLink } from 'lucide-react';
+import { Star, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import SearchBar from './SearchBar';
@@ -41,7 +41,7 @@ const MovieDetail: React.FC<MovieDetailProps> = ({ movie, onClose }) => {
         <div className="p-4 flex justify-between items-start">
           <h2 className="text-2xl font-bold text-cinema-gold">{movie.title}</h2>
           <button onClick={onClose} className="text-cinema-text hover:text-cinema-gold">
-            <ExternalLink size={24} />
+            <X size={24} />
           </button>
         </div>
         <div className="p-4">
@@ -214,7 +214,7 @@ const MovieSearch: React.FC = () => {
                 </div>
                 <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="text-cinema-gold hover:underline flex items-center">
                   View on TMDb
-                  <ExternalLink className="w-4 h-4 ml-1" />
+                  <span className="ml-1">→</span>
                 </a>
               </div>
             </div>
