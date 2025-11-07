@@ -15,24 +15,30 @@ export default function Home() {
       
       {/* Content Sections */}
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <ContentSection 
-          title="Trending Movies" 
+        <ContentSection
+          title="Trending Movies"
           endpoint="/trending/movie/week"
         />
-        
-        <ContentSection 
-          title="Top Rated Movies" 
+
+        <ContentSection
+          title="Action Movies"
+          endpoint="/discover/movie?with_genres=28&sort_by=popularity.desc"
+          mediaType="movie"
+        />
+
+        <ContentSection
+          title="Top Rated Movies"
           endpoint="/movie/top_rated"
           mediaType="movie"
         />
-        
-        <ContentSection 
-          title="Trending TV Shows" 
+
+        <ContentSection
+          title="Trending TV Shows"
           endpoint="/trending/tv/week"
         />
-        
-        <ContentSection 
-          title="Top Rated TV Shows" 
+
+        <ContentSection
+          title="Top Rated TV Shows"
           endpoint="/tv/top_rated"
           mediaType="tv"
         />

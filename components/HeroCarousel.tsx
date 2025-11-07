@@ -130,6 +130,12 @@ export default function HeroCarousel() {
         .swiper-pagination {
           bottom: 20px !important;
         }
+        /* Move pagination higher on mobile to avoid button overlap */
+        @media (max-width: 639px) {
+          .swiper-pagination {
+            bottom: 140px !important;
+          }
+        }
         .swiper-pagination-bullet {
           width: 10px;
           height: 10px;

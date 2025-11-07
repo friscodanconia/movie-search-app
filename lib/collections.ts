@@ -9,6 +9,34 @@ export interface Collection {
 
 export const CURATED_COLLECTIONS: Collection[] = [
   {
+    id: 'action-packed',
+    title: 'Action Packed',
+    description: 'High-octane action movies that will keep you on the edge',
+    icon: '💥',
+    movieIds: [
+      155,    // The Dark Knight
+      27205,  // Inception
+      106,    // Predator
+      280,    // Terminator 2: Judgment Day
+      152,    // Die Hard
+      562,    // Die Hard with a Vengeance
+      9739,   // The Bourne Ultimatum
+      2502,   // The Bourne Supremacy
+      7555,   // The Bourne Identity
+      1865,   // Pirates of the Caribbean: On Stranger Tides
+      22,     // Pirates of the Caribbean: The Curse of the Black Pearl
+      285,    // Pirates of the Caribbean: Dead Man's Chest
+      1771,   // Captain America: The First Avenger
+      100402, // Captain America: The Winter Soldier
+      271110, // Captain America: Civil War
+      99861,  // Avengers: Age of Ultron
+      24428,  // The Avengers
+      299536, // Avengers: Infinity War
+      299537, // Avengers: Endgame
+      603,    // The Matrix
+    ],
+  },
+  {
     id: 'oscar-winners',
     title: 'Oscar Winners',
     description: 'Best Picture winners that defined cinema',

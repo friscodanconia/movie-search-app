@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Film, Bookmark } from 'lucide-react';
+import { Film, Library } from 'lucide-react';
 
 export default function Header() {
   const router = useRouter();
@@ -23,10 +23,10 @@ export default function Header() {
         <nav className="flex items-center gap-3 sm:gap-6">
           <button
             onClick={() => router.push('/collections')}
-            className="flex items-center gap-1.5 sm:gap-2 text-cinema-text hover:text-cinema-gold transition-colors text-sm sm:text-base font-medium"
+            className="flex items-center gap-1.5 sm:gap-2 text-cinema-text hover:text-cinema-gold transition-colors text-xs sm:text-base font-medium"
           >
-            <Bookmark className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="hidden sm:inline">Collections</span>
+            <Library className="w-5 h-5 sm:w-5 sm:h-5" />
+            <span>Collections</span>
           </button>
           <a
             href="https://www.themoviedb.org"
