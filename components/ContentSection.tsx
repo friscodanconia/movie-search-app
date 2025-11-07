@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Star } from 'lucide-react';
+import WatchlistButton from './WatchlistButton';
 
 interface ContentItem {
   id: number;
@@ -85,11 +86,25 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
                   <span className="text-gray-500 text-4xl">🎬</span>
                 </div>
               )}
+              {/* Rating Badge */}
               <div className="absolute top-2 right-2 bg-black bg-opacity-75 px-2 py-1 rounded flex items-center gap-1">
                 <Star size={14} className="fill-cinema-gold text-cinema-gold" />
                 <span className="text-white text-sm font-semibold">
                   {item.vote_average.toFixed(1)}
                 </span>
+              </div>
+              {/* Watchlist Button - Shows on hover */}
+              <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <WatchlistButton
+                  item={{
+                    id: item.id,
+                    title: item.title || item.name || '',
+                    poster_path: item.poster_path,
+                    vote_average: item.vote_average,
+                    media_type: (mediaType || item.media_type || 'movie') as 'movie' | 'tv',
+                  }}
+                  size="sm"
+                />
               </div>
             </div>
             <p className="text-cinema-text text-sm font-medium line-clamp-2">

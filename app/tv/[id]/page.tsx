@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Star, Play, ArrowLeft, Calendar, Tv } from 'lucide-react';
 import VideoModal from '@/components/VideoModal';
+import WatchlistButton from '@/components/WatchlistButton';
 
 interface Genre {
   id: number;
@@ -164,15 +165,28 @@ export default function TVDetailPage() {
                 <span className="text-gray-400">({tvShow.vote_count} votes)</span>
               </div>
             </div>
-            {trailer && (
-              <button
-                onClick={handlePlayTrailer}
-                className="flex items-center gap-2 bg-cinema-gold text-cinema-dark px-6 py-3 rounded-full font-semibold hover:bg-yellow-500 transition-colors"
-              >
-                <Play size={20} className="fill-cinema-dark" />
-                Watch Trailer
-              </button>
-            )}
+            <div className="flex flex-wrap items-center gap-4">
+              {trailer && (
+                <button
+                  onClick={handlePlayTrailer}
+                  className="flex items-center gap-2 bg-cinema-gold text-cinema-dark px-6 py-3 rounded-full font-semibold hover:bg-yellow-500 transition-colors shadow-lg"
+                >
+                  <Play size={20} className="fill-cinema-dark" />
+                  Watch Trailer
+                </button>
+              )}
+              <WatchlistButton
+                item={{
+                  id: tvShow.id,
+                  title: tvShow.name,
+                  poster_path: tvShow.poster_path,
+                  vote_average: tvShow.vote_average,
+                  media_type: 'tv',
+                }}
+                size="lg"
+                showLabel={true}
+              />
+            </div>
           </div>
         </div>
       </div>
