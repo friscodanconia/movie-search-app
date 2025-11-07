@@ -29,7 +29,11 @@ interface Person {
 
 type SearchResult = Movie | Person;
 
-const MovieSearch: React.FC = () => {
+interface MovieSearchProps {
+  onSearchStateChange?: (isActive: boolean) => void;
+}
+
+const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Movie[]>([]);
@@ -157,24 +161,67 @@ const MovieSearch: React.FC = () => {
   useEffect(() => {
     if (searchResults.length > 0) {
       setVisibleResults(searchResults);
+      onSearchStateChange?.(true);
     } else {
       setVisibleResults([]);
+      onSearchStateChange?.(false);
     }
-  }, [searchResults]);
+  }, [searchResults, onSearchStateChange]);
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setSearchResults([]);
+    setVisibleResults([]);
+    setCurrentPage(1);
+    setTotalPages(0);
+    setError(null);
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
-      {/* Minimal Search Bar */}
+      {/* Search Bar with Clear Button */}
       <div className="max-w-3xl mx-auto mb-4">
-        <SearchBar onSearch={handleSearch} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        <div className="relative">
+          <SearchBar onSearch={handleSearch} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+          {(visibleResults.length > 0 || searchTerm) && (
+            <button
+              onClick={handleClearSearch}
+              className="mt-3 w-full sm:w-auto px-6 py-2 bg-gray-700 text-cinema-text rounded-lg hover:bg-gray-600 transition-colors font-medium"
+            >
+              ← Back to Browse
+            </button>
+          )}
+        </div>
       </div>
-      
+
       {/* Search Results */}
       {isLoading && <p className="text-center text-cinema-text py-4">Loading...</p>}
       {error && <p className="text-center text-red-500 py-4">{error}</p>}
       {!isLoading && !error && visibleResults.length === 0 && searchTerm && (
-        <p className="text-center text-cinema-text py-4">No results found</p>
+        <div className="text-center py-8">
+          <p className="text-cinema-text text-lg mb-4">No results found for &ldquo;{searchTerm}&rdquo;</p>
+          <button
+            onClick={handleClearSearch}
+            className="px-6 py-3 bg-cinema-gold text-cinema-dark rounded-full font-semibold hover:bg-yellow-500 transition-colors"
+          >
+            Clear Search
+          </button>
+        </div>
       )}
+
+      {/* Results Header */}
+      {visibleResults.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-cinema-gold">
+            Search Results
+            {searchTerm && <span className="text-cinema-text font-normal"> for &ldquo;{searchTerm}&rdquo;</span>}
+          </h2>
+          <p className="text-gray-400 mt-2">
+            Found {visibleResults.length} {visibleResults.length === 1 ? 'result' : 'results'}
+          </p>
+        </div>
+      )}
+
 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
   {visibleResults.map((movie) => (
     <div 
