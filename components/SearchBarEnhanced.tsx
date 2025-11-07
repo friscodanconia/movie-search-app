@@ -138,12 +138,19 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm, setSearchTe
       : [...selectedGenres, genreId];
 
     setSelectedGenres(newSelectedGenres);
-    debouncedSearch(searchTerm, newSelectedGenres);
 
-    // If there are selected genres, show suggestions
-    if (newSelectedGenres.length > 0 || searchTerm.length >= 2) {
-      setShowSuggestions(true);
+    // Trigger full search with genres
+    if (newSelectedGenres.length > 0) {
+      // Call onSearch immediately to show full results
+      onSearch(searchTerm, newSelectedGenres);
+      setShowSuggestions(false);
+    } else if (searchTerm.trim().length >= 2) {
+      // If no genres but has search term, search with term only
+      onSearch(searchTerm, []);
     }
+
+    // Also update suggestions
+    debouncedSearch(searchTerm, newSelectedGenres);
   };
 
   const handleSuggestionClick = (e: React.MouseEvent, suggestion: SearchSuggestion) => {
