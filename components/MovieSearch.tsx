@@ -42,6 +42,7 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [isGenreSearch, setIsGenreSearch] = useState(false);
 
   const handleLogoClick = () => {
     setSearchTerm('');
@@ -65,6 +66,7 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
 
     setIsLoading(true);
     setError(null);
+    setIsGenreSearch(genres.length > 0);
 
     try {
       let response;
@@ -221,46 +223,156 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
         </div>
       )}
 
-<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-  {visibleResults.map((movie) => (
-    <div 
-      key={movie.id} 
-      className="bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-700 cursor-pointer hover:border-cinema-gold transition-colors"
-      onClick={() => handleMovieClick(movie)}
-      role="button"
-      aria-label={`View details for ${movie.title}`}
-      tabIndex={0}
-          >
-            {movie.poster_path && (
-              <Image 
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
-                width={500}
-                height={750}
-                className="w-full h-64 object-cover"
-                loading="lazy"
-              />
-            )}
-            <div className="p-4">
-              <h2 className="text-xl font-bold mb-2 text-cinema-gold">{movie.title}</h2>
-              {movie.release_date && (
-                <p className="text-sm text-gray-400 mb-2">Released: {movie.release_date}</p>
-              )}
-              <p className="text-sm mb-2">{movie.overview}</p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Star className="w-5 h-5 text-cinema-gold mr-1" />
-                  <span>{movie.vote_average?.toFixed(1) || 'N/A'} ({movie.vote_count || 0} votes)</span>
+      {/* Text Search Layout: Hero + Grid */}
+      {!isGenreSearch && visibleResults.length > 0 && (
+        <>
+          {/* Hero Card - Desktop Only */}
+          <div className="hidden md:block mb-8">
+            {visibleResults[0] && (
+              <div
+                onClick={() => handleMovieClick(visibleResults[0])}
+                className="relative h-[400px] rounded-xl overflow-hidden cursor-pointer group"
+                style={{
+                  backgroundImage: visibleResults[0].backdrop_path
+                    ? `url(https://image.tmdb.org/t/p/original${visibleResults[0].backdrop_path})`
+                    : visibleResults[0].poster_path
+                    ? `url(https://image.tmdb.org/t/p/original${visibleResults[0].poster_path})`
+                    : 'none',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-cinema-dark via-cinema-dark/60 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 right-0 p-8">
+                  <div className="flex items-start gap-6">
+                    {visibleResults[0].poster_path && (
+                      <div className="flex-shrink-0 hidden lg:block">
+                        <Image
+                          src={`https://image.tmdb.org/t/p/w342${visibleResults[0].poster_path}`}
+                          alt={visibleResults[0].title}
+                          width={200}
+                          height={300}
+                          className="rounded-lg shadow-2xl"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <h3 className="text-3xl lg:text-4xl font-bold text-cinema-gold mb-3">
+                        {visibleResults[0].title}
+                      </h3>
+                      <div className="flex items-center gap-4 mb-4">
+                        {visibleResults[0].release_date && (
+                          <span className="text-cinema-text">
+                            {new Date(visibleResults[0].release_date).getFullYear()}
+                          </span>
+                        )}
+                        <div className="flex items-center gap-1">
+                          <Star size={20} className="fill-cinema-gold text-cinema-gold" />
+                          <span className="text-cinema-text font-semibold">
+                            {visibleResults[0].vote_average?.toFixed(1)}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-cinema-text text-lg line-clamp-3 mb-4 max-w-3xl">
+                        {visibleResults[0].overview}
+                      </p>
+                      <button className="px-6 py-3 bg-cinema-gold text-cinema-dark rounded-full font-semibold hover:bg-yellow-500 transition-colors">
+                        View Details
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <a href={`https://www.themoviedb.org/movie/${movie.id}`} target="_blank" rel="noopener noreferrer" className="text-cinema-gold hover:underline flex items-center">
-                  View on TMDb
-                  <span className="ml-1">→</span>
-                </a>
+              </div>
+            )}
+          </div>
+
+          {/* Grid - Shows all on mobile, skips first on desktop */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+            {visibleResults.slice(1).map((movie) => (
+              <div
+                key={movie.id}
+                onClick={() => handleMovieClick(movie)}
+                className="cursor-pointer group"
+              >
+                <div className="relative aspect-[2/3] mb-2 rounded-lg overflow-hidden bg-gray-800 group-hover:ring-2 group-hover:ring-cinema-gold transition-all">
+                  {movie.poster_path ? (
+                    <Image
+                      src={`https://image.tmdb.org/t/p/w342${movie.poster_path}`}
+                      alt={movie.title}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-700">
+                      <span className="text-gray-500 text-4xl">🎬</span>
+                    </div>
+                  )}
+                  <div className="absolute top-2 right-2 bg-black/80 px-2 py-1 rounded flex items-center gap-1">
+                    <Star size={12} className="fill-cinema-gold text-cinema-gold" />
+                    <span className="text-white text-xs font-semibold">
+                      {movie.vote_average?.toFixed(1)}
+                    </span>
+                  </div>
+                </div>
+                <h3 className="text-cinema-text text-sm font-medium line-clamp-2 mb-1">
+                  {movie.title}
+                </h3>
+                {movie.release_date && (
+                  <p className="text-gray-400 text-xs">
+                    {new Date(movie.release_date).getFullYear()}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Genre Search Layout: Netflix Grid */}
+      {isGenreSearch && visibleResults.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+          {visibleResults.map((movie) => (
+            <div
+              key={movie.id}
+              onClick={() => handleMovieClick(movie)}
+              className="cursor-pointer group"
+            >
+              <div className="relative aspect-[2/3] mb-2 rounded-lg overflow-hidden bg-gray-800 group-hover:ring-2 group-hover:ring-cinema-gold transition-all group-hover:scale-105 duration-300">
+                {movie.poster_path ? (
+                  <Image
+                    src={`https://image.tmdb.org/t/p/w342${movie.poster_path}`}
+                    alt={movie.title}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-700">
+                    <span className="text-gray-500 text-4xl">🎬</span>
+                  </div>
+                )}
+                <div className="absolute top-2 right-2 bg-black/80 px-2 py-1 rounded flex items-center gap-1">
+                  <Star size={12} className="fill-cinema-gold text-cinema-gold" />
+                  <span className="text-white text-xs font-semibold">
+                    {movie.vote_average?.toFixed(1)}
+                  </span>
+                </div>
+                {/* Hover overlay with info */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
+                  <h3 className="text-white text-sm font-bold line-clamp-2 mb-1">
+                    {movie.title}
+                  </h3>
+                  {movie.release_date && (
+                    <p className="text-gray-300 text-xs">
+                      {new Date(movie.release_date).getFullYear()}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
+
       {totalPages > 1 && (
         <div className="flex justify-center mt-4">
           <button
