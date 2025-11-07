@@ -39,6 +39,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm, setSearchTe
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [showGenres, setShowGenres] = useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
   // Fetch genres on mount
   useEffect(() => {
@@ -202,7 +203,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm, setSearchTe
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setShowSuggestions(false);
         setShowGenres(false);
       }
@@ -232,7 +233,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm, setSearchTe
   };
 
   return (
-    <div className="relative w-full">
+    <div ref={containerRef} className="relative w-full">
       <form onSubmit={handleSubmit}>
         <div className="relative">
           <input
@@ -245,7 +246,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm, setSearchTe
             onChange={handleInputChange}
             onFocus={() => {
               setShowSuggestions(true);
-              if (genres.length > 0) setShowGenres(true);
+              setShowGenres(true);
             }}
             onKeyDown={handleKeyDown}
           />
