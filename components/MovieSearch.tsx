@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import SearchBar from './SearchBar';
+import SearchBar from './SearchBarEnhanced';
 
 interface Movie {
   id: number;
@@ -55,23 +55,54 @@ const MovieSearch: React.FC = () => {
     router.push(`/${mediaType}/${movie.id}`);
   };
 
-  const handleSearch = async (term: string, page: number = 1) => {
+  const handleSearch = async (term: string, genres: number[] = [], page: number = 1) => {
     setSearchTerm(term);
-    if (!term.trim()) return;
+    if (!term.trim() && genres.length === 0) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(
-        `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${term}&page=${page}`
-      );
+      let response;
+
+      // If genres are selected, use discover API
+      if (genres.length > 0) {
+        const genreQuery = genres.join(',');
+        const searchQuery = term ? `&query=${encodeURIComponent(term)}` : '';
+        response = await fetch(
+          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&with_genres=${genreQuery}&sort_by=popularity.desc${searchQuery}&page=${page}`
+        );
+      } else {
+        // Otherwise use regular multi-search
+        response = await fetch(
+          `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${term}&page=${page}`
+        );
+      }
+
       if (!response.ok) {
         throw new Error('Failed to fetch results');
       }
       const data = await response.json();
-      const processedResults = processSearchResults(data.results);
-      setSearchResults(processedResults);
+
+      // If using discover API, directly map results
+      if (genres.length > 0) {
+        const movies = data.results.map((item: any) => ({
+          id: item.id,
+          title: item.title || item.name,
+          poster_path: item.poster_path,
+          backdrop_path: item.backdrop_path,
+          release_date: item.release_date || item.first_air_date,
+          overview: item.overview,
+          vote_average: item.vote_average,
+          vote_count: item.vote_count,
+          media_type: 'movie' as const,
+        }));
+        setSearchResults(sortMovies(movies));
+      } else {
+        const processedResults = processSearchResults(data.results);
+        setSearchResults(processedResults);
+      }
+
       setCurrentPage(data.page);
       setTotalPages(data.total_pages);
     } catch (error) {
@@ -187,7 +218,7 @@ const MovieSearch: React.FC = () => {
       {totalPages > 1 && (
         <div className="flex justify-center mt-4">
           <button
-            onClick={() => handleSearch(searchTerm, currentPage - 1)}
+            onClick={() => handleSearch(searchTerm, [], currentPage - 1)}
             disabled={currentPage === 1}
             className="px-4 py-2 bg-cinema-gold text-cinema-dark rounded-l-md disabled:opacity-50"
           >
@@ -197,7 +228,7 @@ const MovieSearch: React.FC = () => {
             {currentPage} of {totalPages}
           </span>
           <button
-            onClick={() => handleSearch(searchTerm, currentPage + 1)}
+            onClick={() => handleSearch(searchTerm, [], currentPage + 1)}
             disabled={currentPage === totalPages}
             className="px-4 py-2 bg-cinema-gold text-cinema-dark rounded-r-md disabled:opacity-50"
           >
