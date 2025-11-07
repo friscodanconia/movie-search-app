@@ -42,6 +42,7 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalResults, setTotalResults] = useState(0);
   const [isGenreSearch, setIsGenreSearch] = useState(false);
 
   const handleLogoClick = () => {
@@ -110,6 +111,7 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
 
       setCurrentPage(data.page);
       setTotalPages(data.total_pages);
+      setTotalResults(data.total_results || 0);
     } catch (error) {
       console.error('Error searching:', error);
       setError('An error occurred while searching. Please try again.');
@@ -218,7 +220,8 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
             {searchTerm && <span className="text-cinema-text font-normal"> for &ldquo;{searchTerm}&rdquo;</span>}
           </h2>
           <p className="text-gray-400 mt-2">
-            Found {visibleResults.length} {visibleResults.length === 1 ? 'result' : 'results'}
+            Showing {visibleResults.length} of {totalResults.toLocaleString()} results
+            {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
           </p>
         </div>
       )}
