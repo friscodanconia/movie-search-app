@@ -65,12 +65,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm, setSearchTe
 
       setIsLoading(true);
       try {
-        // If genres are selected, use discover API with genre filter
+        // If genres are selected, use discover API with genre filter (no text search in discover)
         if (genreIds.length > 0) {
           const genreQuery = genreIds.join(',');
-          const searchQuery = term ? `&query=${encodeURIComponent(term)}` : '';
           const response = await fetch(
-            `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&with_genres=${genreQuery}&sort_by=popularity.desc${searchQuery}&page=1`
+            `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&with_genres=${genreQuery}&sort_by=popularity.desc&page=1`
           );
           const data = await response.json();
           const filteredSuggestions = data.results

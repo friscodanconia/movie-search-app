@@ -69,12 +69,11 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
     try {
       let response;
 
-      // If genres are selected, use discover API
+      // If genres are selected, use discover API (discover doesn't support text query)
       if (genres.length > 0) {
         const genreQuery = genres.join(',');
-        const searchQuery = term ? `&query=${encodeURIComponent(term)}` : '';
         response = await fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&with_genres=${genreQuery}&sort_by=popularity.desc${searchQuery}&page=${page}`
+          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&with_genres=${genreQuery}&sort_by=popularity.desc&page=${page}`
         );
       } else {
         // Otherwise use regular multi-search
