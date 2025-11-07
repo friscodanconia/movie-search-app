@@ -220,8 +220,12 @@ export default function MovieDetailPage() {
             <h2 className="text-2xl font-bold text-cinema-gold mb-4">Top Cast</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {movie.credits.cast.slice(0, 6).map((actor) => (
-                <div key={actor.id} className="text-center">
-                  <div className="mb-2 rounded-lg overflow-hidden bg-gray-800">
+                <div
+                  key={actor.id}
+                  onClick={() => router.push(`/person/${actor.id}`)}
+                  className="text-center cursor-pointer group"
+                >
+                  <div className="mb-2 rounded-lg overflow-hidden bg-gray-800 group-hover:ring-2 group-hover:ring-cinema-gold transition-all">
                     {actor.profile_path ? (
                       <Image
                         src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
@@ -236,7 +240,7 @@ export default function MovieDetailPage() {
                       </div>
                     )}
                   </div>
-                  <p className="text-cinema-text font-semibold text-sm">{actor.name}</p>
+                  <p className="text-cinema-text font-semibold text-sm group-hover:text-cinema-gold transition-colors">{actor.name}</p>
                   <p className="text-gray-400 text-xs">{actor.character}</p>
                 </div>
               ))}
