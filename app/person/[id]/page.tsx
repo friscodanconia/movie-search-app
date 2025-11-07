@@ -53,11 +53,18 @@ export default function PersonDetailPage() {
         const data = await response.json();
         setPerson(data);
 
-        // Sort movies by popularity and filter out those without posters
+        // Sort movies: prioritize those with posters, then by rating
         const sortedMovies = data.movie_credits.cast
-          .filter((movie: Movie) => movie.poster_path)
-          .sort((a: Movie, b: Movie) => (b.vote_average || 0) - (a.vote_average || 0))
-          .slice(0, 50); // Show top 50 movies
+          .sort((a: Movie, b: Movie) => {
+            // First, prioritize movies with posters
+            const aHasPoster = a.poster_path ? 1 : 0;
+            const bHasPoster = b.poster_path ? 1 : 0;
+            if (aHasPoster !== bHasPoster) {
+              return bHasPoster - aHasPoster;
+            }
+            // Then sort by rating
+            return (b.vote_average || 0) - (a.vote_average || 0);
+          });
 
         setMovies(sortedMovies);
       } catch (err) {
@@ -165,7 +172,7 @@ export default function PersonDetailPage() {
       {/* Filmography */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <h2 className="text-2xl md:text-3xl font-bold text-cinema-gold mb-6">
-          Filmography ({movies.length} movies)
+          Filmography ({movies.length} {movies.length === 1 ? 'movie' : 'movies'})
         </h2>
 
         {movies.length === 0 ? (
@@ -179,18 +186,26 @@ export default function PersonDetailPage() {
                 className="cursor-pointer group"
               >
                 <div className="relative aspect-[2/3] mb-2 rounded-lg overflow-hidden bg-gray-800 group-hover:ring-2 group-hover:ring-cinema-gold transition-all group-hover:scale-105 duration-300">
-                  <Image
-                    src={`https://image.tmdb.org/t/p/w342${movie.poster_path}`}
-                    alt={movie.title || movie.name || 'Movie'}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute top-2 right-2 bg-black/80 px-2 py-1 rounded flex items-center gap-1">
-                    <Star size={12} className="fill-cinema-gold text-cinema-gold" />
-                    <span className="text-white text-xs font-semibold">
-                      {movie.vote_average?.toFixed(1)}
-                    </span>
-                  </div>
+                  {movie.poster_path ? (
+                    <Image
+                      src={`https://image.tmdb.org/t/p/w342${movie.poster_path}`}
+                      alt={movie.title || movie.name || 'Movie'}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-700">
+                      <span className="text-gray-500 text-6xl">🎬</span>
+                    </div>
+                  )}
+                  {movie.vote_average && movie.vote_average > 0 && (
+                    <div className="absolute top-2 right-2 bg-black/80 px-2 py-1 rounded flex items-center gap-1">
+                      <Star size={12} className="fill-cinema-gold text-cinema-gold" />
+                      <span className="text-white text-xs font-semibold">
+                        {movie.vote_average.toFixed(1)}
+                      </span>
+                    </div>
+                  )}
                   {/* Hover overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
                     <h3 className="text-white text-sm font-bold line-clamp-2 mb-1">
