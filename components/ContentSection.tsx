@@ -29,8 +29,10 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
   useEffect(() => {
     const fetchContent = async () => {
       try {
+        // Check if endpoint already has query parameters
+        const separator = endpoint.includes('?') ? '&' : '?';
         const response = await fetch(
-          `https://api.themoviedb.org/3${endpoint}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+          `https://api.themoviedb.org/3${endpoint}${separator}api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
         );
         const data = await response.json();
         setItems(data.results.slice(0, 10));
