@@ -53,6 +53,20 @@ export default function PersonDetailPage() {
         const data = await response.json();
         setPerson(data);
 
+        // Debug: Log the raw API response
+        console.log('Person API Response:', {
+          name: data.name,
+          totalMoviesInAPI: data.movie_credits?.cast?.length || 0,
+          movieCredits: data.movie_credits
+        });
+
+        // Check if movie_credits.cast exists
+        if (!data.movie_credits || !data.movie_credits.cast) {
+          console.error('No movie credits found in API response');
+          setMovies([]);
+          return;
+        }
+
         // Sort movies: prioritize those with posters, then by rating
         const sortedMovies = data.movie_credits.cast
           .sort((a: Movie, b: Movie) => {
@@ -66,6 +80,7 @@ export default function PersonDetailPage() {
             return (b.vote_average || 0) - (a.vote_average || 0);
           });
 
+        console.log('Sorted movies count:', sortedMovies.length);
         setMovies(sortedMovies);
       } catch (err) {
         setError('Failed to load person details');
