@@ -66,8 +66,34 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm, setSearchTe
 
       setIsLoading(true);
       try {
-        // If genres are selected, use discover API with genre filter (no text search in discover)
-        if (genreIds.length > 0) {
+        // If we have both text search AND genre filters, use search API then filter by genre
+        if (term.length >= 2 && genreIds.length > 0) {
+          const response = await fetch(
+            `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${term}&page=1`
+          );
+          const data = await response.json();
+          const filteredSuggestions = data.results
+            .filter((item: any) => {
+              // Only include movies/tv that match the selected genres
+              if (item.media_type !== 'movie' && item.media_type !== 'tv') return false;
+              if (!item.genre_ids) return false;
+              return genreIds.some(genreId => item.genre_ids.includes(genreId));
+            })
+            .slice(0, 6)
+            .map((item: any) => ({
+              id: item.id,
+              title: item.title || item.name,
+              media_type: item.media_type,
+              year: item.release_date ? new Date(item.release_date).getFullYear().toString() :
+                    item.first_air_date ? new Date(item.first_air_date).getFullYear().toString() : undefined,
+              poster_path: item.poster_path,
+              vote_average: item.vote_average,
+              genre_ids: item.genre_ids,
+            }));
+          setSuggestions(filteredSuggestions);
+        }
+        // If genres are selected but no text, use discover API with genre filter
+        else if (genreIds.length > 0 && term.length < 2) {
           const genreQuery = genreIds.join(',');
           const response = await fetch(
             `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&with_genres=${genreQuery}&sort_by=popularity.desc&page=1`
@@ -86,7 +112,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm, setSearchTe
             }));
           setSuggestions(filteredSuggestions);
         } else if (term.length >= 2) {
-          // Regular multi-search
+          // Regular multi-search (no genre filter)
           const response = await fetch(
             `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${term}&page=1`
           );
