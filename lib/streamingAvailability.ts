@@ -1,5 +1,6 @@
 // Streaming Availability API integration (RapidAPI)
 // Fallback when TMDb has no India streaming data
+// Enhanced coverage for Indian OTT platforms
 
 interface StreamingProvider {
   provider_id: number;
