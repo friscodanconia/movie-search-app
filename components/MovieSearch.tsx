@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import SearchBar from './SearchBarEnhanced';
 import SkeletonCard from './SkeletonCard';
+import AdvancedFilters, { FilterOptions } from './AdvancedFilters';
 
 interface Movie {
   id: number;
@@ -59,6 +60,7 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
   const [totalResults, setTotalResults] = useState(0);
   const [isGenreSearch, setIsGenreSearch] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [filters, setFilters] = useState<FilterOptions>({});
 
   const handleLogoClick = () => {
     setSearchTerm('');
@@ -120,8 +122,18 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
       // If genres are selected but no text, use discover API
       else if (genres.length > 0 && !term.trim()) {
         const genreQuery = genres.join(',');
+
+        // Build filter parameters
+        const filterParams = [];
+        if (filters.yearFrom) filterParams.push(`primary_release_date.gte=${filters.yearFrom}-01-01`);
+        if (filters.yearTo) filterParams.push(`primary_release_date.lte=${filters.yearTo}-12-31`);
+        if (filters.minRating) filterParams.push(`vote_average.gte=${filters.minRating}`);
+        if (filters.language) filterParams.push(`with_original_language=${filters.language}`);
+
+        const filterQuery = filterParams.length > 0 ? `&${filterParams.join('&')}` : '';
+
         response = await fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&with_genres=${genreQuery}&sort_by=popularity.desc&page=${page}`
+          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&with_genres=${genreQuery}&sort_by=popularity.desc&page=${page}${filterQuery}`
         );
 
         if (!response.ok) {
@@ -241,22 +253,38 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
     setTotalPages(0);
     setError(null);
     setHasSearched(false);
+    setFilters({});
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
-      {/* Search Bar with Clear Button */}
+      {/* Search Bar with Advanced Filters */}
       <div className="max-w-3xl mx-auto mb-4">
         <div className="relative">
           <SearchBar onSearch={handleSearch} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-          {(visibleResults.length > 0 || searchTerm) && (
-            <button
-              onClick={handleClearSearch}
-              className="mt-3 w-full sm:w-auto px-6 py-2 bg-gray-700 text-cinema-text rounded-lg hover:bg-gray-600 transition-colors font-medium"
-            >
-              ← Back to Browse
-            </button>
-          )}
+
+          {/* Advanced Filters and Clear Button */}
+          <div className="mt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 justify-between">
+            <AdvancedFilters
+              currentFilters={filters}
+              onFilterChange={(newFilters) => {
+                setFilters(newFilters);
+                // Re-trigger search with new filters if we have an active search
+                if (searchTerm || hasSearched) {
+                  handleSearch(searchTerm, [], 1);
+                }
+              }}
+            />
+
+            {(visibleResults.length > 0 || searchTerm) && (
+              <button
+                onClick={handleClearSearch}
+                className="px-6 py-2 bg-gray-700 text-cinema-text rounded-lg hover:bg-gray-600 transition-colors font-medium"
+              >
+                ← Back to Browse
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
