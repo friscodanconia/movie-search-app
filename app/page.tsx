@@ -22,31 +22,43 @@ export default function Home() {
       {!isSearchActive && (
         <div className="max-w-7xl mx-auto px-4 py-8">
           <ContentSection
-            title="Trending Movies"
-            endpoint="/trending/movie/week"
+            title="Trending in India"
+            endpoint="/trending/movie/week?region=IN"
+          />
+
+          <ContentSection
+            title="Popular Hindi Movies"
+            endpoint="/discover/movie?with_original_language=hi&sort_by=popularity.desc&region=IN"
+            mediaType="movie"
+          />
+
+          <ContentSection
+            title="Popular Tamil Movies"
+            endpoint="/discover/movie?with_original_language=ta&sort_by=popularity.desc&region=IN"
+            mediaType="movie"
+          />
+
+          <ContentSection
+            title="Popular Telugu Movies"
+            endpoint="/discover/movie?with_original_language=te&sort_by=popularity.desc&region=IN"
+            mediaType="movie"
           />
 
           <ContentSection
             title="Action Movies"
-            endpoint="/discover/movie?with_genres=28&sort_by=popularity.desc"
+            endpoint="/discover/movie?with_genres=28&sort_by=popularity.desc&region=IN"
             mediaType="movie"
           />
 
           <ContentSection
             title="Top Rated Movies"
-            endpoint="/movie/top_rated"
+            endpoint="/movie/top_rated?region=IN"
             mediaType="movie"
           />
 
           <ContentSection
             title="Trending TV Shows"
-            endpoint="/trending/tv/week"
-          />
-
-          <ContentSection
-            title="Top Rated TV Shows"
-            endpoint="/tv/top_rated"
-            mediaType="tv"
+            endpoint="/trending/tv/week?region=IN"
           />
         </div>
       )}
