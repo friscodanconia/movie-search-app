@@ -57,6 +57,7 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalResults, setTotalResults] = useState(0);
   const [isGenreSearch, setIsGenreSearch] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const handleLogoClick = () => {
     setSearchTerm('');
@@ -129,9 +130,11 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
       setCurrentPage(data.page);
       setTotalPages(data.total_pages);
       setTotalResults(data.total_results || 0);
+      setHasSearched(true);
     } catch (error) {
       console.error('Error searching:', error);
       setError('An error occurred while searching. Please try again.');
+      setHasSearched(true);
     } finally {
       setIsLoading(false);
     }
@@ -204,6 +207,7 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
     setCurrentPage(1);
     setTotalPages(0);
     setError(null);
+    setHasSearched(false);
   };
 
   return (
@@ -226,7 +230,7 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
       {/* Search Results */}
       {isLoading && <p className="text-center text-cinema-text py-4">Loading...</p>}
       {error && <p className="text-center text-red-500 py-4">{error}</p>}
-      {!isLoading && !error && visibleResults.length === 0 && searchTerm && (
+      {!isLoading && !error && hasSearched && visibleResults.length === 0 && searchTerm && (
         <div className="text-center py-8">
           <p className="text-cinema-text text-lg mb-4">No results found for &ldquo;{searchTerm}&rdquo;</p>
           <button
