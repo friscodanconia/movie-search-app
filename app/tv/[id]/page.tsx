@@ -99,9 +99,9 @@ export default function TVDetailPage() {
         setTVShow(tvData);
         setSimilarShows(similarData.results.slice(0, 6));
 
-        // Extract US providers
-        if (providersData.results?.US) {
-          setWatchProviders(providersData.results.US);
+        // Extract India providers
+        if (providersData.results?.IN) {
+          setWatchProviders(providersData.results.IN);
         }
       } catch (err) {
         setError('Failed to load TV show details');
@@ -234,7 +234,7 @@ export default function TVDetailPage() {
         {/* Where to Watch */}
         {watchProviders && (
           <div className="mb-8">
-            <WatchProviders providers={watchProviders} country="US" />
+            <WatchProviders providers={watchProviders} country="IN" />
           </div>
         )}
 

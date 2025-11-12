@@ -18,6 +18,15 @@ interface AdvancedFiltersProps {
 const LANGUAGES = [
   { code: '', name: 'All Languages' },
   { code: 'en', name: 'English' },
+  { code: 'hi', name: 'Hindi' },
+  { code: 'ta', name: 'Tamil' },
+  { code: 'te', name: 'Telugu' },
+  { code: 'ml', name: 'Malayalam' },
+  { code: 'kn', name: 'Kannada' },
+  { code: 'bn', name: 'Bengali' },
+  { code: 'mr', name: 'Marathi' },
+  { code: 'pa', name: 'Punjabi' },
+  { code: 'gu', name: 'Gujarati' },
   { code: 'es', name: 'Spanish' },
   { code: 'fr', name: 'French' },
   { code: 'de', name: 'German' },
@@ -25,7 +34,6 @@ const LANGUAGES = [
   { code: 'ja', name: 'Japanese' },
   { code: 'ko', name: 'Korean' },
   { code: 'zh', name: 'Chinese' },
-  { code: 'hi', name: 'Hindi' },
   { code: 'pt', name: 'Portuguese' },
 ];
 
