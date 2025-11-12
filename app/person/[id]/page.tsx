@@ -53,16 +53,8 @@ export default function PersonDetailPage() {
         const data = await response.json();
         setPerson(data);
 
-        // Debug: Log the raw API response
-        console.log('Person API Response:', {
-          name: data.name,
-          totalMoviesInAPI: data.movie_credits?.cast?.length || 0,
-          movieCredits: data.movie_credits
-        });
-
         // Check if movie_credits.cast exists
         if (!data.movie_credits || !data.movie_credits.cast) {
-          console.error('No movie credits found in API response');
           setMovies([]);
           return;
         }
@@ -80,8 +72,6 @@ export default function PersonDetailPage() {
             return (b.vote_average || 0) - (a.vote_average || 0);
           });
 
-        console.log('Sorted movies count:', sortedMovies.length);
-        console.log('🎬 NEW CODE IS RUNNING! Total movies:', sortedMovies.length);
         setMovies(sortedMovies);
       } catch (err) {
         setError('Failed to load person details');
@@ -189,10 +179,6 @@ export default function PersonDetailPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <h2 className="text-2xl md:text-3xl font-bold text-cinema-gold mb-6">
           Filmography ({movies.length} {movies.length === 1 ? 'movie' : 'movies'})
-          {/* DEBUG: Visual indicator that new code is deployed */}
-          <span className="ml-4 text-xs bg-green-500 text-white px-2 py-1 rounded">
-            v2.0-DEBUG
-          </span>
         </h2>
 
         {movies.length === 0 ? (
