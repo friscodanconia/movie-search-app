@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Star, ArrowLeft, Calendar, MapPin } from 'lucide-react';
+import SkeletonPersonDetail from '@/components/SkeletonPersonDetail';
 
 interface Movie {
   id: number;
@@ -87,11 +88,7 @@ export default function PersonDetailPage() {
   }, [params.id]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-cinema-dark flex items-center justify-center">
-        <p className="text-cinema-text text-xl">Loading...</p>
-      </div>
-    );
+    return <SkeletonPersonDetail />;
   }
 
   if (error || !person) {

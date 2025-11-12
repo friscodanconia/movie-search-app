@@ -57,7 +57,13 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
         <h2 className="text-3xl font-bold text-cinema-gold mb-6">{title}</h2>
         <div className="flex gap-4 overflow-x-auto pb-4">
           {[...Array(10)].map((_, i) => (
-            <div key={i} className="flex-shrink-0 w-48 h-72 bg-gray-800 rounded-lg animate-pulse" />
+            <div key={i} className="flex-shrink-0 w-48">
+              <div className="relative aspect-[2/3] mb-2 rounded-lg overflow-hidden bg-gray-800">
+                <div className="w-full h-full bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 bg-[length:200%_100%] animate-shimmer"></div>
+              </div>
+              <div className="h-4 bg-gray-800 rounded w-3/4 mb-2 animate-pulse"></div>
+              <div className="h-3 bg-gray-800 rounded w-1/2 animate-pulse"></div>
+            </div>
           ))}
         </div>
       </section>

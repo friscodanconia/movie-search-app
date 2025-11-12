@@ -5,6 +5,7 @@ import { Star } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import SearchBar from './SearchBarEnhanced';
+import SkeletonCard from './SkeletonCard';
 
 interface Movie {
   id: number;
@@ -228,7 +229,13 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
       </div>
 
       {/* Search Results */}
-      {isLoading && <p className="text-center text-cinema-text py-4">Loading...</p>}
+      {isLoading && (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 mt-6">
+          {[...Array(10)].map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      )}
       {error && <p className="text-center text-red-500 py-4">{error}</p>}
       {!isLoading && !error && hasSearched && visibleResults.length === 0 && searchTerm && (
         <div className="text-center py-8">

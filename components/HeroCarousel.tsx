@@ -6,6 +6,7 @@ import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import { useRouter } from 'next/navigation';
 import { Play, Info } from 'lucide-react';
 import VideoModal from './VideoModal';
+import SkeletonHero from './SkeletonHero';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
@@ -64,11 +65,7 @@ export default function HeroCarousel() {
   }, []);
 
   if (isLoading) {
-    return (
-      <div className="w-full h-[70vh] bg-gray-900 flex items-center justify-center">
-        <p className="text-cinema-text text-xl">Loading...</p>
-      </div>
-    );
+    return <SkeletonHero />;
   }
 
   return (
