@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Star, Play, ArrowLeft, Calendar, Clock } from 'lucide-react';
 import VideoModal from '@/components/VideoModal';
 import WatchlistButton from '@/components/WatchlistButton';
+import WatchProviders from '@/components/WatchProviders';
 
 interface Genre {
   id: number;
@@ -53,11 +54,19 @@ interface SimilarMovie {
   vote_average: number;
 }
 
+interface WatchProvidersData {
+  link?: string;
+  flatrate?: any[];
+  rent?: any[];
+  buy?: any[];
+}
+
 export default function MovieDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [similarMovies, setSimilarMovies] = useState<SimilarMovie[]>([]);
+  const [watchProviders, setWatchProviders] = useState<WatchProvidersData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
@@ -66,12 +75,15 @@ export default function MovieDetailPage() {
     const fetchMovieDetails = async () => {
       try {
         setIsLoading(true);
-        const [movieResponse, similarResponse] = await Promise.all([
+        const [movieResponse, similarResponse, providersResponse] = await Promise.all([
           fetch(
             `https://api.themoviedb.org/3/movie/${params.id}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&append_to_response=videos,credits`
           ),
           fetch(
             `https://api.themoviedb.org/3/movie/${params.id}/similar?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+          ),
+          fetch(
+            `https://api.themoviedb.org/3/movie/${params.id}/watch/providers?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
           ),
         ]);
 
@@ -81,9 +93,15 @@ export default function MovieDetailPage() {
 
         const movieData = await movieResponse.json();
         const similarData = await similarResponse.json();
+        const providersData = await providersResponse.json();
 
         setMovie(movieData);
         setSimilarMovies(similarData.results.slice(0, 6));
+
+        // Extract US providers (you can change to other countries as needed)
+        if (providersData.results?.US) {
+          setWatchProviders(providersData.results.US);
+        }
       } catch (err) {
         setError('Failed to load movie details');
         console.error(err);
@@ -213,6 +231,13 @@ export default function MovieDetailPage() {
           <h2 className="text-2xl font-bold text-cinema-gold mb-3">Overview</h2>
           <p className="text-cinema-text text-lg leading-relaxed">{movie.overview}</p>
         </div>
+
+        {/* Where to Watch */}
+        {watchProviders && (
+          <div className="mb-8">
+            <WatchProviders providers={watchProviders} country="US" />
+          </div>
+        )}
 
         {/* Cast */}
         {movie.credits?.cast && movie.credits.cast.length > 0 && (
