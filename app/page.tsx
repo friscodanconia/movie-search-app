@@ -28,25 +28,25 @@ export default function Home() {
 
           <ContentSection
             title="Popular Hindi Movies"
-            endpoint="/discover/movie?with_original_language=hi&sort_by=popularity.desc&region=IN"
+            endpoint="/discover/movie?with_original_language=hi&sort_by=popularity.desc&vote_count.gte=50&vote_average.gte=6&region=IN"
             mediaType="movie"
           />
 
           <ContentSection
             title="Popular Tamil Movies"
-            endpoint="/discover/movie?with_original_language=ta&sort_by=popularity.desc&region=IN"
+            endpoint="/discover/movie?with_original_language=ta&sort_by=popularity.desc&vote_count.gte=50&vote_average.gte=6&region=IN"
             mediaType="movie"
           />
 
           <ContentSection
             title="Popular Telugu Movies"
-            endpoint="/discover/movie?with_original_language=te&sort_by=popularity.desc&region=IN"
+            endpoint="/discover/movie?with_original_language=te&sort_by=popularity.desc&vote_count.gte=50&vote_average.gte=6&region=IN"
             mediaType="movie"
           />
 
           <ContentSection
             title="Action Movies"
-            endpoint="/discover/movie?with_genres=28&sort_by=popularity.desc&region=IN"
+            endpoint="/discover/movie?with_genres=28&sort_by=popularity.desc&vote_count.gte=100&region=IN"
             mediaType="movie"
           />
 
