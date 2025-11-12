@@ -88,7 +88,7 @@ export default function PersonDetailPage() {
 
         // Count movies per genre
         const genreCount: Record<number, number> = {};
-        sortedMovies.forEach((movie) => {
+        sortedMovies.forEach((movie: Movie) => {
           movie.genre_ids?.forEach((genreId) => {
             genreCount[genreId] = (genreCount[genreId] || 0) + 1;
           });
