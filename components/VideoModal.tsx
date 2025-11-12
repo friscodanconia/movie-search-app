@@ -55,13 +55,13 @@ const VideoModal: React.FC<VideoModalProps> = ({ videoKey, onClose }) => {
           <X size={32} />
         </button>
         <iframe
-          src={`https://www.youtube.com/embed/${videoKey}?autoplay=1`}
+          src={`https://www.youtube.com/embed/${videoKey}?autoplay=1&mute=0&rel=0&modestbranding=1`}
           title="Movie Trailer"
           width="100%"
           height="100%"
           className="rounded-lg"
           allowFullScreen
-          allow="autoplay; encrypted-media"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         />
       </div>
     </div>
