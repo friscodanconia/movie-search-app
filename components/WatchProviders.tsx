@@ -22,15 +22,33 @@ interface WatchProvidersProps {
   country?: string;
 }
 
-export default function WatchProviders({ providers, country = 'US' }: WatchProvidersProps) {
+interface WatchProvidersWithTitle extends WatchProvidersProps {
+  movieTitle?: string;
+}
+
+export default function WatchProviders({ providers, country = 'US', movieTitle }: WatchProvidersWithTitle) {
   // Show message if no providers available
   if (!providers || (!providers.flatrate && !providers.rent && !providers.buy)) {
+    const searchQuery = movieTitle
+      ? `where to watch ${movieTitle} in ${country === 'IN' ? 'India' : country}`
+      : `streaming platforms ${country === 'IN' ? 'India' : country}`;
+    const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+
     return (
       <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
         <h3 className="text-xl font-bold text-cinema-gold mb-4">Where to Watch</h3>
-        <p className="text-gray-400 text-sm">
-          Streaming information not available for {country} at this time. Check local streaming platforms or theaters.
+        <p className="text-gray-400 text-sm mb-4">
+          Streaming information not currently available in our database for {country === 'IN' ? 'India' : country}.
         </p>
+        <a
+          href={searchUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-cinema-gold text-cinema-dark rounded-lg hover:bg-yellow-500 transition-colors font-semibold text-sm"
+        >
+          <ExternalLink size={16} />
+          Search Streaming Options
+        </a>
       </div>
     );
   }

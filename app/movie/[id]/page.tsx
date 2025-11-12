@@ -234,7 +234,11 @@ export default function MovieDetailPage() {
 
         {/* Where to Watch */}
         <div className="mb-8">
-          <WatchProviders providers={watchProviders} country="IN" />
+          <WatchProviders
+            providers={watchProviders}
+            country="IN"
+            movieTitle={movie.title}
+          />
         </div>
 
         {/* Cast */}

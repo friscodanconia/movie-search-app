@@ -233,7 +233,11 @@ export default function TVDetailPage() {
 
         {/* Where to Watch */}
         <div className="mb-8">
-          <WatchProviders providers={watchProviders} country="IN" />
+          <WatchProviders
+            providers={watchProviders}
+            country="IN"
+            movieTitle={tvShow.name}
+          />
         </div>
 
         {/* Cast */}
