@@ -66,27 +66,19 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm, setSearchTe
 
       setIsLoading(true);
       try {
-        console.log('🔍 Search params:', { term, genreIds });
-
         // If we have both text search AND genre filters, use search API then filter by genre
         if (term.length >= 2 && genreIds.length > 0) {
-          console.log('📋 Using combined search (text + genre)');
           const response = await fetch(
             `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${term}&page=1`
           );
           const data = await response.json();
-          console.log('📦 API returned:', data.results.length, 'results');
 
           const filteredSuggestions = data.results
             .filter((item: any) => {
               // Only include movies/tv that match the selected genres
               if (item.media_type !== 'movie' && item.media_type !== 'tv') return false;
               if (!item.genre_ids) return false;
-              const matches = genreIds.some(genreId => item.genre_ids.includes(genreId));
-              if (matches) {
-                console.log('✅ Match:', item.title || item.name, 'genres:', item.genre_ids);
-              }
-              return matches;
+              return genreIds.some(genreId => item.genre_ids.includes(genreId));
             })
             .slice(0, 6)
             .map((item: any) => ({
@@ -99,7 +91,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm, setSearchTe
               vote_average: item.vote_average,
               genre_ids: item.genre_ids,
             }));
-          console.log('🎯 After genre filter:', filteredSuggestions.length, 'suggestions');
           setSuggestions(filteredSuggestions);
         }
         // If genres are selected but no text, use discover API with genre filter

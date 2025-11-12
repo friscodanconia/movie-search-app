@@ -16,6 +16,7 @@ interface Movie {
   vote_average: number;
   character?: string;
   media_type?: string;
+  genre_ids?: number[];
 }
 
 interface Person {
@@ -36,8 +37,11 @@ export default function PersonDetailPage() {
   const router = useRouter();
   const [person, setPerson] = useState<Person | null>(null);
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [allMovies, setAllMovies] = useState<Movie[]>([]); // Store all movies
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
+  const [availableGenres, setAvailableGenres] = useState<{id: number, name: string, count: number}[]>([]);
 
   useEffect(() => {
     const fetchPersonDetails = async () => {
@@ -73,7 +77,33 @@ export default function PersonDetailPage() {
             return (b.vote_average || 0) - (a.vote_average || 0);
           });
 
+        setAllMovies(sortedMovies);
         setMovies(sortedMovies);
+
+        // Fetch genre names and calculate available genres
+        const genreResponse = await fetch(
+          `https://api.themoviedb.org/3/genre/movie/list?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+        );
+        const genreData = await genreResponse.json();
+
+        // Count movies per genre
+        const genreCount: Record<number, number> = {};
+        sortedMovies.forEach((movie) => {
+          movie.genre_ids?.forEach((genreId) => {
+            genreCount[genreId] = (genreCount[genreId] || 0) + 1;
+          });
+        });
+
+        // Map to genre names
+        const genresWithCount = Object.entries(genreCount)
+          .map(([genreId, count]) => {
+            const genre = genreData.genres.find((g: any) => g.id === parseInt(genreId));
+            return genre ? { id: genre.id, name: genre.name, count } : null;
+          })
+          .filter((g): g is {id: number, name: string, count: number} => g !== null)
+          .sort((a, b) => b.count - a.count); // Sort by most common genres
+
+        setAvailableGenres(genresWithCount);
       } catch (err) {
         setError('Failed to load person details');
         console.error(err);
@@ -86,6 +116,18 @@ export default function PersonDetailPage() {
       fetchPersonDetails();
     }
   }, [params.id]);
+
+  // Filter movies when genre selection changes
+  useEffect(() => {
+    if (selectedGenre === null) {
+      setMovies(allMovies);
+    } else {
+      const filtered = allMovies.filter((movie) =>
+        movie.genre_ids?.includes(selectedGenre)
+      );
+      setMovies(filtered);
+    }
+  }, [selectedGenre, allMovies]);
 
   if (isLoading) {
     return <SkeletonPersonDetail />;
@@ -174,9 +216,41 @@ export default function PersonDetailPage() {
 
       {/* Filmography */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-cinema-gold mb-6">
+        <h2 className="text-2xl md:text-3xl font-bold text-cinema-gold mb-4">
           Filmography ({movies.length} {movies.length === 1 ? 'movie' : 'movies'})
         </h2>
+
+        {/* Genre Filter */}
+        {availableGenres.length > 0 && (
+          <div className="mb-6">
+            <p className="text-sm text-gray-400 mb-3">Filter by genre:</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setSelectedGenre(null)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  selectedGenre === null
+                    ? 'bg-cinema-gold text-cinema-dark'
+                    : 'bg-gray-800 text-cinema-text hover:bg-gray-700'
+                }`}
+              >
+                All ({allMovies.length})
+              </button>
+              {availableGenres.map((genre) => (
+                <button
+                  key={genre.id}
+                  onClick={() => setSelectedGenre(genre.id)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    selectedGenre === genre.id
+                      ? 'bg-cinema-gold text-cinema-dark'
+                      : 'bg-gray-800 text-cinema-text hover:bg-gray-700'
+                  }`}
+                >
+                  {genre.name} ({genre.count})
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {movies.length === 0 ? (
           <p className="text-cinema-text">No movies found.</p>
