@@ -33,7 +33,7 @@ export default function HeroCarousel() {
     const fetchPopularMovies = async () => {
       try {
         const response = await fetch(
-          `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&page=1`
+          `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&region=IN&page=1`
         );
         const data = await response.json();
         const topMovies = data.results.slice(0, 5);
