@@ -232,11 +232,9 @@ export default function TVDetailPage() {
         </div>
 
         {/* Where to Watch */}
-        {watchProviders && (
-          <div className="mb-8">
-            <WatchProviders providers={watchProviders} country="IN" />
-          </div>
-        )}
+        <div className="mb-8">
+          <WatchProviders providers={watchProviders} country="IN" />
+        </div>
 
         {/* Cast */}
         {tvShow.credits?.cast && tvShow.credits.cast.length > 0 && (

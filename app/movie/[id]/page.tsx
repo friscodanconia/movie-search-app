@@ -233,11 +233,9 @@ export default function MovieDetailPage() {
         </div>
 
         {/* Where to Watch */}
-        {watchProviders && (
-          <div className="mb-8">
-            <WatchProviders providers={watchProviders} country="IN" />
-          </div>
-        )}
+        <div className="mb-8">
+          <WatchProviders providers={watchProviders} country="IN" />
+        </div>
 
         {/* Cast */}
         {movie.credits?.cast && movie.credits.cast.length > 0 && (
