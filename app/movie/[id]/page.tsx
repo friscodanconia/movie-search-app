@@ -7,6 +7,7 @@ import { Star, Play, ArrowLeft, Calendar, Clock } from 'lucide-react';
 import VideoModal from '@/components/VideoModal';
 import WatchlistButton from '@/components/WatchlistButton';
 import WatchProviders from '@/components/WatchProviders';
+import { fetchStreamingAvailability } from '@/lib/streamingAvailability';
 
 interface Genre {
   id: number;
@@ -98,9 +99,21 @@ export default function MovieDetailPage() {
         setMovie(movieData);
         setSimilarMovies(similarData.results.slice(0, 6));
 
-        // Extract India providers
+        // Extract India providers from TMDb
         if (providersData.results?.IN) {
           setWatchProviders(providersData.results.IN);
+        } else {
+          // Fallback: Try Streaming Availability API for India
+          console.log('TMDb has no India data, trying Streaming Availability API...');
+          const fallbackData = await fetchStreamingAvailability(
+            movieData.title,
+            'movie',
+            'in'
+          );
+          if (fallbackData) {
+            console.log('Found streaming data via Streaming Availability API');
+            setWatchProviders(fallbackData);
+          }
         }
       } catch (err) {
         setError('Failed to load movie details');
