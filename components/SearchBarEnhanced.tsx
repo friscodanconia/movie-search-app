@@ -162,8 +162,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm, setSearchTe
       router.push(`/movie/${suggestion.id}`);
     } else if (suggestion.media_type === 'tv') {
       router.push(`/tv/${suggestion.id}`);
+    } else if (suggestion.media_type === 'person') {
+      // Navigate directly to person filmography page
+      router.push(`/person/${suggestion.id}`);
     } else {
-      // For persons, do a search
+      // Fallback: do a search
       setSearchTerm(suggestion.title);
       onSearch(suggestion.title);
     }
