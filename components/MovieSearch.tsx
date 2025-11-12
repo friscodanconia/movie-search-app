@@ -86,31 +86,49 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
     setIsLoading(true);
     setSearchTerm(term);
     setError(null);
-    setIsGenreSearch(genres.length > 0);
+    setIsGenreSearch(genres.length > 0 && !term.trim());
 
     try {
       let response;
+      let processedResults: DisplayItem[] = [];
 
-      // If genres are selected, use discover API (discover doesn't support text query)
-      if (genres.length > 0) {
+      // If we have BOTH text search AND genre filters
+      if (term.trim() && genres.length > 0) {
+        // Use search API with text, then filter by genre client-side
+        response = await fetch(
+          `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${term}&page=${page}`
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch results');
+        }
+        const data = await response.json();
+
+        // Filter results to only include items that match selected genres
+        const genreFilteredResults = data.results.filter((item: any) => {
+          if (item.media_type !== 'movie' && item.media_type !== 'tv') return false;
+          if (!item.genre_ids || !Array.isArray(item.genre_ids)) return false;
+          return genres.some(genreId => item.genre_ids.includes(genreId));
+        });
+
+        processedResults = processSearchResults(genreFilteredResults);
+        setSearchResults(processedResults);
+        setCurrentPage(data.page);
+        setTotalPages(Math.ceil(genreFilteredResults.length / 20));
+        setTotalResults(genreFilteredResults.length);
+      }
+      // If genres are selected but no text, use discover API
+      else if (genres.length > 0 && !term.trim()) {
         const genreQuery = genres.join(',');
         response = await fetch(
           `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&with_genres=${genreQuery}&sort_by=popularity.desc&page=${page}`
         );
-      } else {
-        // Otherwise use regular multi-search
-        response = await fetch(
-          `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${term}&page=${page}`
-        );
-      }
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch results');
-      }
-      const data = await response.json();
+        if (!response.ok) {
+          throw new Error('Failed to fetch results');
+        }
+        const data = await response.json();
 
-      // If using discover API, directly map results
-      if (genres.length > 0) {
         const movies = data.results.map((item: any) => ({
           id: item.id,
           title: item.title || item.name,
@@ -123,14 +141,28 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
           media_type: 'movie' as const,
         }));
         setSearchResults(sortMovies(movies));
-      } else {
-        const processedResults = processSearchResults(data.results);
+        setCurrentPage(data.page);
+        setTotalPages(data.total_pages);
+        setTotalResults(data.total_results || 0);
+      }
+      // Otherwise use regular multi-search (text only, no genre filter)
+      else {
+        response = await fetch(
+          `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${term}&page=${page}`
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch results');
+        }
+        const data = await response.json();
+
+        processedResults = processSearchResults(data.results);
         setSearchResults(processedResults);
+        setCurrentPage(data.page);
+        setTotalPages(data.total_pages);
+        setTotalResults(data.total_results || 0);
       }
 
-      setCurrentPage(data.page);
-      setTotalPages(data.total_pages);
-      setTotalResults(data.total_results || 0);
       setHasSearched(true);
     } catch (error) {
       console.error('Error searching:', error);
