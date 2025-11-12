@@ -98,9 +98,9 @@ export default function MovieDetailPage() {
         setMovie(movieData);
         setSimilarMovies(similarData.results.slice(0, 6));
 
-        // Extract US providers (you can change to other countries as needed)
-        if (providersData.results?.US) {
-          setWatchProviders(providersData.results.US);
+        // Extract India providers
+        if (providersData.results?.IN) {
+          setWatchProviders(providersData.results.IN);
         }
       } catch (err) {
         setError('Failed to load movie details');
@@ -235,7 +235,7 @@ export default function MovieDetailPage() {
         {/* Where to Watch */}
         {watchProviders && (
           <div className="mb-8">
-            <WatchProviders providers={watchProviders} country="US" />
+            <WatchProviders providers={watchProviders} country="IN" />
           </div>
         )}
 
