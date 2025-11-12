@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Star } from 'lucide-react';
+import { Star, Loader } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import SearchBar from './SearchBarEnhanced';
 import SkeletonCard from './SkeletonCard';
+import AdvancedFilters, { FilterOptions } from './AdvancedFilters';
 
 interface Movie {
   id: number;
@@ -53,12 +54,16 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
   const [searchResults, setSearchResults] = useState<DisplayItem[]>([]);
   const [visibleResults, setVisibleResults] = useState<DisplayItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [totalResults, setTotalResults] = useState(0);
   const [isGenreSearch, setIsGenreSearch] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [filters, setFilters] = useState<FilterOptions>({});
+  const [currentGenres, setCurrentGenres] = useState<number[]>([]);
+  const loadMoreRef = React.useRef<HTMLDivElement>(null);
 
   const handleLogoClick = () => {
     setSearchTerm('');
@@ -80,11 +85,16 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
     }
   };
 
-  const handleSearch = async (term: string, genres: number[] = [], page: number = 1) => {
+  const handleSearch = async (term: string, genres: number[] = [], page: number = 1, appendResults: boolean = false) => {
     if (!term.trim() && genres.length === 0) return;
 
-    setIsLoading(true);
+    if (appendResults) {
+      setIsLoadingMore(true);
+    } else {
+      setIsLoading(true);
+    }
     setSearchTerm(term);
+    setCurrentGenres(genres);
     setError(null);
     setIsGenreSearch(genres.length > 0 && !term.trim());
 
@@ -112,7 +122,11 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
         });
 
         processedResults = processSearchResults(genreFilteredResults);
-        setSearchResults(processedResults);
+        if (appendResults) {
+          setSearchResults(prev => [...prev, ...processedResults]);
+        } else {
+          setSearchResults(processedResults);
+        }
         setCurrentPage(data.page);
         setTotalPages(Math.ceil(genreFilteredResults.length / 20));
         setTotalResults(genreFilteredResults.length);
@@ -120,8 +134,18 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
       // If genres are selected but no text, use discover API
       else if (genres.length > 0 && !term.trim()) {
         const genreQuery = genres.join(',');
+
+        // Build filter parameters
+        const filterParams = [];
+        if (filters.yearFrom) filterParams.push(`primary_release_date.gte=${filters.yearFrom}-01-01`);
+        if (filters.yearTo) filterParams.push(`primary_release_date.lte=${filters.yearTo}-12-31`);
+        if (filters.minRating) filterParams.push(`vote_average.gte=${filters.minRating}`);
+        if (filters.language) filterParams.push(`with_original_language=${filters.language}`);
+
+        const filterQuery = filterParams.length > 0 ? `&${filterParams.join('&')}` : '';
+
         response = await fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&with_genres=${genreQuery}&sort_by=popularity.desc&page=${page}`
+          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&with_genres=${genreQuery}&sort_by=popularity.desc&page=${page}${filterQuery}`
         );
 
         if (!response.ok) {
@@ -140,7 +164,12 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
           vote_count: item.vote_count,
           media_type: 'movie' as const,
         }));
-        setSearchResults(sortMovies(movies));
+        const sortedMovies = sortMovies(movies);
+        if (appendResults) {
+          setSearchResults(prev => [...prev, ...sortedMovies]);
+        } else {
+          setSearchResults(sortedMovies);
+        }
         setCurrentPage(data.page);
         setTotalPages(data.total_pages);
         setTotalResults(data.total_results || 0);
@@ -157,7 +186,11 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
         const data = await response.json();
 
         processedResults = processSearchResults(data.results);
-        setSearchResults(processedResults);
+        if (appendResults) {
+          setSearchResults(prev => [...prev, ...processedResults]);
+        } else {
+          setSearchResults(processedResults);
+        }
         setCurrentPage(data.page);
         setTotalPages(data.total_pages);
         setTotalResults(data.total_results || 0);
@@ -170,6 +203,7 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
       setHasSearched(true);
     } finally {
       setIsLoading(false);
+      setIsLoadingMore(false);
     }
   };
 
@@ -233,6 +267,32 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
     }
   }, [searchResults, onSearchStateChange]);
 
+  // Infinite Scroll - Intersection Observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0];
+        if (target.isIntersecting && !isLoading && !isLoadingMore && currentPage < totalPages) {
+          // Load next page
+          handleSearch(searchTerm, currentGenres, currentPage + 1, true);
+        }
+      },
+      { threshold: 0.1, rootMargin: '100px' }
+    );
+
+    const currentRef = loadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, totalPages, isLoading, isLoadingMore, searchTerm, currentGenres]);
+
   const handleClearSearch = () => {
     setSearchTerm('');
     setSearchResults([]);
@@ -241,22 +301,38 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
     setTotalPages(0);
     setError(null);
     setHasSearched(false);
+    setFilters({});
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
-      {/* Search Bar with Clear Button */}
+      {/* Search Bar with Advanced Filters */}
       <div className="max-w-3xl mx-auto mb-4">
         <div className="relative">
           <SearchBar onSearch={handleSearch} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-          {(visibleResults.length > 0 || searchTerm) && (
-            <button
-              onClick={handleClearSearch}
-              className="mt-3 w-full sm:w-auto px-6 py-2 bg-gray-700 text-cinema-text rounded-lg hover:bg-gray-600 transition-colors font-medium"
-            >
-              ← Back to Browse
-            </button>
-          )}
+
+          {/* Advanced Filters and Clear Button */}
+          <div className="mt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 justify-between">
+            <AdvancedFilters
+              currentFilters={filters}
+              onFilterChange={(newFilters) => {
+                setFilters(newFilters);
+                // Re-trigger search with new filters if we have an active search
+                if (searchTerm || hasSearched) {
+                  handleSearch(searchTerm, [], 1);
+                }
+              }}
+            />
+
+            {(visibleResults.length > 0 || searchTerm) && (
+              <button
+                onClick={handleClearSearch}
+                className="px-6 py-2 bg-gray-700 text-cinema-text rounded-lg hover:bg-gray-600 transition-colors font-medium"
+              >
+                ← Back to Browse
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -463,25 +539,22 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
         </div>
       )}
 
-      {totalPages > 1 && (
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={() => handleSearch(searchTerm, [], currentPage - 1)}
-            disabled={currentPage === 1}
-            className="px-4 py-2 bg-cinema-gold text-cinema-dark rounded-l-md disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span className="px-4 py-2 bg-gray-800 text-cinema-text">
-            {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => handleSearch(searchTerm, [], currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-cinema-gold text-cinema-dark rounded-r-md disabled:opacity-50"
-          >
-            Next
-          </button>
+      {/* Infinite Scroll Trigger */}
+      {!isGenreSearch && visibleResults.length > 0 && currentPage < totalPages && (
+        <div ref={loadMoreRef} className="flex justify-center py-8">
+          {isLoadingMore && (
+            <div className="flex items-center gap-2 text-cinema-gold">
+              <Loader className="animate-spin" size={24} />
+              <span>Loading more results...</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* End of results indicator */}
+      {!isGenreSearch && visibleResults.length > 0 && currentPage >= totalPages && totalPages > 1 && (
+        <div className="flex justify-center py-8 text-gray-400">
+          <p>You&apos;ve reached the end of the results</p>
         </div>
       )}
     </div>

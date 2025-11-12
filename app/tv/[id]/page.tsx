@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Star, Play, ArrowLeft, Calendar, Tv } from 'lucide-react';
 import VideoModal from '@/components/VideoModal';
 import WatchlistButton from '@/components/WatchlistButton';
+import WatchProviders from '@/components/WatchProviders';
 
 interface Genre {
   id: number;
@@ -54,11 +55,19 @@ interface SimilarShow {
   vote_average: number;
 }
 
+interface WatchProvidersData {
+  link?: string;
+  flatrate?: any[];
+  rent?: any[];
+  buy?: any[];
+}
+
 export default function TVDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [tvShow, setTVShow] = useState<TVShow | null>(null);
   const [similarShows, setSimilarShows] = useState<SimilarShow[]>([]);
+  const [watchProviders, setWatchProviders] = useState<WatchProvidersData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
@@ -67,12 +76,15 @@ export default function TVDetailPage() {
     const fetchTVDetails = async () => {
       try {
         setIsLoading(true);
-        const [tvResponse, similarResponse] = await Promise.all([
+        const [tvResponse, similarResponse, providersResponse] = await Promise.all([
           fetch(
             `https://api.themoviedb.org/3/tv/${params.id}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&append_to_response=videos,credits`
           ),
           fetch(
             `https://api.themoviedb.org/3/tv/${params.id}/similar?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+          ),
+          fetch(
+            `https://api.themoviedb.org/3/tv/${params.id}/watch/providers?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
           ),
         ]);
 
@@ -82,9 +94,15 @@ export default function TVDetailPage() {
 
         const tvData = await tvResponse.json();
         const similarData = await similarResponse.json();
+        const providersData = await providersResponse.json();
 
         setTVShow(tvData);
         setSimilarShows(similarData.results.slice(0, 6));
+
+        // Extract US providers
+        if (providersData.results?.US) {
+          setWatchProviders(providersData.results.US);
+        }
       } catch (err) {
         setError('Failed to load TV show details');
         console.error(err);
@@ -212,6 +230,13 @@ export default function TVDetailPage() {
           <h2 className="text-2xl font-bold text-cinema-gold mb-3">Overview</h2>
           <p className="text-cinema-text text-lg leading-relaxed">{tvShow.overview}</p>
         </div>
+
+        {/* Where to Watch */}
+        {watchProviders && (
+          <div className="mb-8">
+            <WatchProviders providers={watchProviders} country="US" />
+          </div>
+        )}
 
         {/* Cast */}
         {tvShow.credits?.cast && tvShow.credits.cast.length > 0 && (

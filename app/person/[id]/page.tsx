@@ -64,9 +64,6 @@ export default function PersonDetailPage() {
           return;
         }
 
-        console.log('Sample movie data:', data.movie_credits.cast[0]);
-        console.log('Has genre_ids?', 'genre_ids' in data.movie_credits.cast[0]);
-
         // Sort movies: prioritize those with posters, then by rating
         const sortedMovies = data.movie_credits.cast
           .sort((a: Movie, b: Movie) => {
@@ -79,9 +76,6 @@ export default function PersonDetailPage() {
             // Then sort by rating
             return (b.vote_average || 0) - (a.vote_average || 0);
           });
-
-        console.log('Total movies:', sortedMovies.length);
-        console.log('Movies with genre_ids:', sortedMovies.filter((m: Movie) => m.genre_ids && m.genre_ids.length > 0).length);
 
         setAllMovies(sortedMovies);
         setMovies(sortedMovies);
@@ -109,8 +103,6 @@ export default function PersonDetailPage() {
           .filter((g): g is {id: number, name: string, count: number} => g !== null)
           .sort((a, b) => b.count - a.count); // Sort by most common genres
 
-        console.log('Genre count:', genreCount);
-        console.log('Available genres with counts:', genresWithCount);
         setAvailableGenres(genresWithCount);
       } catch (err) {
         setError('Failed to load person details');
