@@ -79,10 +79,10 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
   };
 
   const handleSearch = async (term: string, genres: number[] = [], page: number = 1) => {
-    setSearchTerm(term);
     if (!term.trim() && genres.length === 0) return;
 
     setIsLoading(true);
+    setSearchTerm(term);
     setError(null);
     setIsGenreSearch(genres.length > 0);
 
