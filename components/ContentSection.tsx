@@ -35,7 +35,11 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
           `https://api.themoviedb.org/3${endpoint}${separator}api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
         );
         const data = await response.json();
-        setItems(data.results.slice(0, 10));
+        // Filter out items without posters and with zero ratings
+        const filteredResults = data.results
+          .filter((item: ContentItem) => item.poster_path && item.vote_average > 0)
+          .slice(0, 10);
+        setItems(filteredResults);
       } catch (error) {
         console.error(`Error fetching ${title}:`, error);
       } finally {
