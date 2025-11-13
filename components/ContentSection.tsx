@@ -82,9 +82,9 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
           <div
             key={item.id}
             onClick={() => handleItemClick(item)}
-            className="flex-shrink-0 w-48 cursor-pointer group"
+            className="flex-shrink-0 w-48 cursor-pointer group active:scale-95 transition-transform"
           >
-            <div className="relative mb-2 rounded-lg overflow-hidden bg-gray-800 group-hover:ring-2 group-hover:ring-cinema-gold transition-all">
+            <div className="relative mb-2 rounded-lg overflow-hidden bg-gray-800 transition-all hover:ring-2 hover:ring-cinema-gold">
               {item.poster_path ? (
                 <Image
                   src={`https://image.tmdb.org/t/p/w342${item.poster_path}`}
@@ -105,8 +105,8 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
                   {item.vote_average.toFixed(1)}
                 </span>
               </div>
-              {/* Watchlist Button - Shows on hover */}
-              <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              {/* Watchlist Button - Shows on hover (desktop only) */}
+              <div className="absolute bottom-2 right-2 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none md:pointer-events-auto">
                 <WatchlistButton
                   item={{
                     id: item.id,
