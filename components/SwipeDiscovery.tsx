@@ -141,27 +141,28 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       }
     }
 
-    // Wait for animation to complete, then update state
+    // Fetch more when running low (append instead of replace)
+    if (currentIndex >= movies.length - 5) {
+      fetchMovies(true);
+    }
+  }, [isAnimating, currentMovie, currentIndex, movies.length, fetchMovies]);
+
+  const handleAnimationComplete = React.useCallback(() => {
+    if (!swipeDirection) return; // Only proceed if we're in a swipe animation
+
+    // Reset motion values FIRST before changing card
+    x.set(0);
+
+    // Then update to next card
+    setCurrentIndex(prev => prev + 1);
+    setSwipeDirection(null);
+    setIsAnimating(false);
+
+    // Delay showing background cards to ensure new positions are calculated
     setTimeout(() => {
-      // Reset motion values FIRST before changing card
-      x.set(0);
-
-      // Then update to next card
-      setCurrentIndex(prev => prev + 1);
-      setSwipeDirection(null);
-      setIsAnimating(false);
-
-      // Delay showing background cards to ensure new positions are calculated
-      setTimeout(() => {
-        setShowBackgroundCards(true);
-      }, 50);
-
-      // Fetch more when running low (append instead of replace)
-      if (currentIndex >= movies.length - 5) {
-        fetchMovies(true);
-      }
-    }, 400);
-  }, [isAnimating, currentMovie, currentIndex, x, movies.length, fetchMovies]);
+      setShowBackgroundCards(true);
+    }, 50);
+  }, [swipeDirection, x]);
 
   const handleDragEnd = (event: any, info: PanInfo) => {
     const swipeVelocity = info.velocity.x;
@@ -320,6 +321,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
             drag={!isAnimating ? "x" : false}
             dragConstraints={{ left: 0, right: 0 }}
             onDragEnd={handleDragEnd}
+            onAnimationComplete={handleAnimationComplete}
             initial={{ scale: 0.95, opacity: 0 }}
             animate={swipeDirection ? {
               x: swipeDirection === 'left' ? -500 : 500,
