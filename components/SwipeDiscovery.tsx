@@ -267,8 +267,8 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
 
       {/* Card Stack */}
       <div className="relative w-full aspect-[2/3]">
-        {/* Third card (background) */}
-        {thirdMovie && (
+        {/* Third card (background) - Hide during animation to prevent flashing */}
+        {thirdMovie && !isAnimating && (
           <div
             className="absolute inset-0 w-full h-full"
             style={{
@@ -288,8 +288,8 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
           </div>
         )}
 
-        {/* Second card (middle) */}
-        {nextMovie && (
+        {/* Second card (middle) - Hide during animation to prevent flashing */}
+        {nextMovie && !isAnimating && (
           <div
             className="absolute inset-0 w-full h-full"
             style={{
