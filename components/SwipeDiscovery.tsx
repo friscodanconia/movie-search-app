@@ -137,12 +137,19 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       }
     }
 
-    // Move to next card after animation completes
+    // Wait for animation to complete, then update state
     setTimeout(() => {
+      // Reset motion values FIRST before changing card
+      x.set(0);
+
+      // Then update to next card
       setCurrentIndex(prev => prev + 1);
       setSwipeDirection(null);
-      setIsAnimating(false);
-      x.set(0);
+
+      // Small delay before allowing next animation
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, 50);
 
       // Fetch more when running low (append instead of replace)
       if (currentIndex >= movies.length - 5) {
@@ -294,14 +301,14 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
         {currentMovie && (
           <motion.div
             key={currentMovie.id}
-            className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
+            className={`absolute inset-0 w-full h-full ${!isAnimating ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
             style={{
-              x,
-              rotate,
+              x: !isAnimating ? x : 0,
+              rotate: !isAnimating ? rotate : 0,
               opacity,
               zIndex: 3
             }}
-            drag="x"
+            drag={!isAnimating ? "x" : false}
             dragConstraints={{ left: 0, right: 0 }}
             onDragEnd={handleDragEnd}
             initial={{ scale: 0.95, opacity: 0 }}
@@ -312,6 +319,8 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
             } : {
               scale: 1,
               opacity: 1,
+              x: 0,
+              rotate: 0,
               transition: { duration: 0.2 }
             }}
           >
@@ -328,23 +337,27 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
               {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
-              {/* Swipe Indicators */}
-              <motion.div
-                className="absolute top-8 left-8 bg-red-500 text-white px-6 py-3 rounded-full font-bold text-2xl rotate-[-20deg] border-4 border-red-500"
-                style={{
-                  opacity: skipOpacity
-                }}
-              >
-                SKIP
-              </motion.div>
-              <motion.div
-                className="absolute top-8 right-8 bg-green-500 text-white px-6 py-3 rounded-full font-bold text-2xl rotate-[20deg] border-4 border-green-500"
-                style={{
-                  opacity: saveOpacity
-                }}
-              >
-                SAVE
-              </motion.div>
+              {/* Swipe Indicators - Only show during manual drag */}
+              {!swipeDirection && (
+                <>
+                  <motion.div
+                    className="absolute top-8 left-8 bg-red-500 text-white px-6 py-3 rounded-full font-bold text-2xl rotate-[-20deg] border-4 border-red-500"
+                    style={{
+                      opacity: skipOpacity
+                    }}
+                  >
+                    SKIP
+                  </motion.div>
+                  <motion.div
+                    className="absolute top-8 right-8 bg-green-500 text-white px-6 py-3 rounded-full font-bold text-2xl rotate-[20deg] border-4 border-green-500"
+                    style={{
+                      opacity: saveOpacity
+                    }}
+                  >
+                    SAVE
+                  </motion.div>
+                </>
+              )}
 
               {/* Movie Info */}
               <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -380,7 +393,8 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       <div className="flex items-center justify-center gap-6 mt-8">
         <button
           onClick={() => handleSwipe('left')}
-          className="w-16 h-16 rounded-full bg-gray-800 hover:bg-red-600 text-white flex items-center justify-center transition-all hover:scale-110 shadow-lg"
+          disabled={isAnimating}
+          className="w-16 h-16 rounded-full bg-gray-800 hover:bg-red-600 text-white flex items-center justify-center transition-all hover:scale-110 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           title="Skip (←)"
         >
           <X size={28} />
@@ -388,7 +402,8 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
 
         <button
           onClick={handleViewDetails}
-          className="w-20 h-20 rounded-full bg-cinema-gold hover:bg-yellow-500 text-cinema-dark flex items-center justify-center transition-all hover:scale-110 shadow-lg"
+          disabled={isAnimating}
+          className="w-20 h-20 rounded-full bg-cinema-gold hover:bg-yellow-500 text-cinema-dark flex items-center justify-center transition-all hover:scale-110 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           title="View Details (↑)"
         >
           <Info size={32} />
@@ -396,7 +411,8 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
 
         <button
           onClick={() => handleSwipe('right')}
-          className="w-16 h-16 rounded-full bg-gray-800 hover:bg-green-600 text-white flex items-center justify-center transition-all hover:scale-110 shadow-lg"
+          disabled={isAnimating}
+          className="w-16 h-16 rounded-full bg-gray-800 hover:bg-green-600 text-white flex items-center justify-center transition-all hover:scale-110 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           title="Add to Watchlist (→)"
         >
           <Heart size={28} />
