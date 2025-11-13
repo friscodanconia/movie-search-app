@@ -115,8 +115,12 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
   const thirdMovie = movies[currentIndex + 2];
 
   const handleSwipe = (direction: 'left' | 'right') => {
-    if (isAnimating) return; // Prevent double swipes
+    if (isAnimating) {
+      console.log('Swipe blocked: animation in progress');
+      return; // Prevent double swipes
+    }
 
+    console.log('Starting swipe:', direction, 'isAnimating:', isAnimating);
     setIsAnimating(true);
     setSwipeDirection(direction);
 
@@ -145,17 +149,14 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       // Then update to next card
       setCurrentIndex(prev => prev + 1);
       setSwipeDirection(null);
-
-      // Small delay before allowing next animation
-      setTimeout(() => {
-        setIsAnimating(false);
-      }, 50);
+      setIsAnimating(false);
+      console.log('Animation complete, isAnimating set to false');
 
       // Fetch more when running low (append instead of replace)
       if (currentIndex >= movies.length - 5) {
         fetchMovies(true);
       }
-    }, 350);
+    }, 400);
   };
 
   const handleDragEnd = (event: any, info: PanInfo) => {
@@ -180,27 +181,38 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
     fetchMovies();
   };
 
-  const handleKeyPress = (e: KeyboardEvent) => {
-    if (!currentMovie) return;
-
-    switch (e.key) {
-      case 'ArrowLeft':
-        handleSwipe('left');
-        break;
-      case 'ArrowRight':
-        handleSwipe('right');
-        break;
-      case 'ArrowUp':
-      case 'Enter':
-        handleViewDetails();
-        break;
-    }
-  };
-
   useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      console.log('Key pressed:', e.key, 'isAnimating:', isAnimating, 'currentMovie:', !!currentMovie);
+
+      if (!currentMovie || isAnimating) {
+        console.log('Ignoring key press - animating or no current movie');
+        return;
+      }
+
+      switch (e.key) {
+        case 'ArrowLeft':
+          console.log('Calling handleSwipe(left)');
+          handleSwipe('left');
+          break;
+        case 'ArrowRight':
+          console.log('Calling handleSwipe(right)');
+          handleSwipe('right');
+          break;
+        case 'ArrowUp':
+        case 'Enter':
+          handleViewDetails();
+          break;
+      }
+    };
+
+    console.log('Setting up keyboard listener, isAnimating:', isAnimating);
     window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentMovie]);
+    return () => {
+      console.log('Removing keyboard listener');
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [currentMovie, isAnimating]);
 
   if (isLoading && movies.length === 0) {
     return (
