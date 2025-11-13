@@ -114,7 +114,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
   const nextMovie = movies[currentIndex + 1];
   const thirdMovie = movies[currentIndex + 2];
 
-  const handleSwipe = (direction: 'left' | 'right') => {
+  const handleSwipe = React.useCallback((direction: 'left' | 'right') => {
     if (isAnimating) {
       console.log('Swipe blocked: animation in progress');
       return; // Prevent double swipes
@@ -157,7 +157,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
         fetchMovies(true);
       }
     }, 400);
-  };
+  }, [isAnimating, currentMovie, currentIndex, x]);
 
   const handleDragEnd = (event: any, info: PanInfo) => {
     const swipeVelocity = info.velocity.x;
@@ -170,11 +170,11 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
     }
   };
 
-  const handleViewDetails = () => {
+  const handleViewDetails = React.useCallback(() => {
     if (currentMovie) {
       router.push(`/${currentMovie.media_type}/${currentMovie.id}`);
     }
-  };
+  }, [currentMovie, router]);
 
   const handleReset = () => {
     setCurrentIndex(0);
@@ -212,7 +212,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       console.log('Removing keyboard listener');
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [currentMovie, isAnimating]);
+  }, [currentMovie, isAnimating, handleSwipe, handleViewDetails]);
 
   if (isLoading && movies.length === 0) {
     return (
