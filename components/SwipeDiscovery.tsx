@@ -33,6 +33,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const router = useRouter();
   const x = useMotionValue(0);
@@ -46,11 +47,11 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
     fetchMovies();
   }, []);
 
-  const fetchMovies = async () => {
+  const fetchMovies = async (append = false) => {
     try {
-      setIsLoading(true);
+      if (!append) setIsLoading(true);
 
-      let movies: Movie[] = [];
+      let newMovies: Movie[] = [];
 
       if (initialType === 'mixed') {
         // Fetch both movies and TV shows
@@ -78,11 +79,11 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
           .map((item: any) => ({ ...item, media_type: 'tv' as const }));
 
         // Interleave movies and TV shows
-        movies = [];
+        newMovies = [];
         const maxLength = Math.max(movieItems.length, tvItems.length);
         for (let i = 0; i < maxLength; i++) {
-          if (movieItems[i]) movies.push(movieItems[i]);
-          if (tvItems[i]) movies.push(tvItems[i]);
+          if (movieItems[i]) newMovies.push(movieItems[i]);
+          if (tvItems[i]) newMovies.push(tvItems[i]);
         }
       } else {
         // Fetch only specified type
@@ -91,16 +92,21 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
           `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&sort_by=popularity.desc&vote_count.gte=50&vote_average.gte=6&region=${region}&page=${Math.floor(Math.random() * 5) + 1}`
         );
         const data = await response.json();
-        movies = data.results
+        newMovies = data.results
           .filter((item: any) => item.poster_path)
           .map((item: any) => ({ ...item, media_type: initialType }));
       }
 
-      setMovies(movies.slice(0, 20));
+      // Append to existing movies or replace
+      if (append) {
+        setMovies(prev => [...prev, ...newMovies.slice(0, 20)]);
+      } else {
+        setMovies(newMovies.slice(0, 20));
+      }
     } catch (error) {
       console.error('Error fetching movies:', error);
     } finally {
-      setIsLoading(false);
+      if (!append) setIsLoading(false);
     }
   };
 
@@ -109,6 +115,9 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
   const thirdMovie = movies[currentIndex + 2];
 
   const handleSwipe = (direction: 'left' | 'right') => {
+    if (isAnimating) return; // Prevent double swipes
+
+    setIsAnimating(true);
     setSwipeDirection(direction);
 
     if (direction === 'right' && currentMovie) {
@@ -128,17 +137,18 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       }
     }
 
-    // Move to next card after animation
+    // Move to next card after animation completes
     setTimeout(() => {
       setCurrentIndex(prev => prev + 1);
       setSwipeDirection(null);
+      setIsAnimating(false);
       x.set(0);
 
-      // Fetch more when running low
+      // Fetch more when running low (append instead of replace)
       if (currentIndex >= movies.length - 5) {
-        fetchMovies();
+        fetchMovies(true);
       }
-    }, 300);
+    }, 350);
   };
 
   const handleDragEnd = (event: any, info: PanInfo) => {
@@ -283,6 +293,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
         {/* Top card (interactive) */}
         {currentMovie && (
           <motion.div
+            key={currentMovie.id}
             className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
             style={{
               x,
@@ -293,11 +304,16 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             onDragEnd={handleDragEnd}
+            initial={{ scale: 0.95, opacity: 0 }}
             animate={swipeDirection ? {
               x: swipeDirection === 'left' ? -500 : 500,
               opacity: 0,
-              transition: { duration: 0.3 }
-            } : {}}
+              transition: { duration: 0.35, ease: 'easeOut' }
+            } : {
+              scale: 1,
+              opacity: 1,
+              transition: { duration: 0.2 }
+            }}
           >
             <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-900 shadow-2xl">
               {/* Poster Image */}
