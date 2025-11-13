@@ -79,40 +79,59 @@ export default function InstantSearch() {
 
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${encodeURIComponent(searchQuery)}&page=1`
+
+      // Parallel searches to ensure we get all types of results
+      const [multiResponse, peopleResponse] = await Promise.all([
+        fetch(
+          `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${encodeURIComponent(searchQuery)}&page=1`
+        ),
+        fetch(
+          `https://api.themoviedb.org/3/search/person?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${encodeURIComponent(searchQuery)}&page=1`
+        )
+      ]);
+
+      const [multiData, peopleData] = await Promise.all([
+        multiResponse.json(),
+        peopleResponse.json()
+      ]);
+
+      // Filter multi search results (movies and TV shows)
+      const multiResults = multiData.results.filter((item: SearchResult) =>
+        (item.media_type === 'movie' || item.media_type === 'tv') &&
+        item.poster_path
       );
 
-      const data = await response.json();
+      // Filter people results
+      const peopleResults = peopleData.results
+        .filter((item: any) => item.profile_path)
+        .map((item: any) => ({
+          ...item,
+          media_type: 'person'
+        }));
 
-      // Filter out items without images
-      const validResults = data.results.filter((item: SearchResult) =>
-        (item.media_type === 'movie' || item.media_type === 'tv' || item.media_type === 'person') &&
-        (item.poster_path || item.profile_path)
-      );
+      // Separate by type
+      const movies = multiResults.filter((item: SearchResult) => item.media_type === 'movie');
+      const tvShows = multiResults.filter((item: SearchResult) => item.media_type === 'tv');
 
-      // Separate by type for balanced results
-      const movies = validResults.filter((item: SearchResult) => item.media_type === 'movie');
-      const tvShows = validResults.filter((item: SearchResult) => item.media_type === 'tv');
-      const people = validResults.filter((item: SearchResult) => item.media_type === 'person');
-
-      // Create balanced result set: prioritize diversity
+      // Create balanced result set
       const balanced: SearchResult[] = [];
 
       // Add top 4 movies
       balanced.push(...movies.slice(0, 4));
 
-      // Add top 2 people (important for actor/director searches)
-      balanced.push(...people.slice(0, 2));
+      // Add top 2 people (guaranteed from separate search)
+      balanced.push(...peopleResults.slice(0, 2));
 
       // Add top 2 TV shows
       balanced.push(...tvShows.slice(0, 2));
 
-      // If we don't have 8 items, fill with remaining results
+      // If we still don't have 8 items, fill with remaining movies/shows
       if (balanced.length < 8) {
-        const remaining = validResults
-          .filter((item: SearchResult) => !balanced.includes(item))
-          .slice(0, 8 - balanced.length);
+        const remaining = [
+          ...movies.slice(4),
+          ...tvShows.slice(2),
+          ...peopleResults.slice(2)
+        ].slice(0, 8 - balanced.length);
         balanced.push(...remaining);
       }
 
