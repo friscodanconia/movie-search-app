@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Film, Library } from 'lucide-react';
+import { Film, Library, Sparkles } from 'lucide-react';
 import InstantSearch from './InstantSearch';
 
 export default function Header() {
@@ -36,12 +36,21 @@ export default function Header() {
             </div>
 
             <button
+              onClick={() => router.push('/discover')}
+              className="flex items-center gap-1.5 sm:gap-2 text-cinema-text hover:text-cinema-gold transition-colors text-xs sm:text-base font-medium"
+            >
+              <Sparkles className="w-5 h-5 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Discover</span>
+            </button>
+
+            <button
               onClick={() => router.push('/collections')}
               className="flex items-center gap-1.5 sm:gap-2 text-cinema-text hover:text-cinema-gold transition-colors text-xs sm:text-base font-medium"
             >
               <Library className="w-5 h-5 sm:w-5 sm:h-5" />
               <span className="hidden sm:inline">Collections</span>
             </button>
+
             <a
               href="https://www.themoviedb.org"
               target="_blank"
