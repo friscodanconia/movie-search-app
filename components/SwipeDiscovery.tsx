@@ -43,10 +43,38 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
   const skipOpacity = useTransform(x, [-200, -50, 0], [1, 0.5, 0]);
   const saveOpacity = useTransform(x, [0, 50, 200], [0, 0.5, 1]);
 
-  // Fetch discover feed
+  // Restore state from sessionStorage or fetch discover feed
   useEffect(() => {
+    // Try to restore previous session state
+    const savedState = sessionStorage.getItem('swipeDiscoveryState');
+    if (savedState) {
+      try {
+        const { movies: savedMovies, currentIndex: savedIndex } = JSON.parse(savedState);
+        if (savedMovies && savedMovies.length > 0) {
+          setMovies(savedMovies);
+          setCurrentIndex(savedIndex || 0);
+          setIsLoading(false);
+          setShowBackgroundCards(true);
+          return; // Don't fetch new movies
+        }
+      } catch (error) {
+        console.error('Error restoring state:', error);
+      }
+    }
+
+    // No saved state, fetch new movies
     fetchMovies();
   }, []);
+
+  // Save state to sessionStorage whenever it changes
+  useEffect(() => {
+    if (movies.length > 0 && !isLoading) {
+      sessionStorage.setItem('swipeDiscoveryState', JSON.stringify({
+        movies,
+        currentIndex
+      }));
+    }
+  }, [movies, currentIndex, isLoading]);
 
   const fetchMovies = async (append = false) => {
     try {
@@ -183,6 +211,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
 
   const handleReset = () => {
     setCurrentIndex(0);
+    sessionStorage.removeItem('swipeDiscoveryState'); // Clear saved state
     fetchMovies();
   };
 
