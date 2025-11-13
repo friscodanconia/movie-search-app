@@ -34,6 +34,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
   const [isLoading, setIsLoading] = useState(true);
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showBackgroundCards, setShowBackgroundCards] = useState(true);
 
   const router = useRouter();
   const x = useMotionValue(0);
@@ -116,13 +117,12 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
 
   const handleSwipe = React.useCallback((direction: 'left' | 'right') => {
     if (isAnimating) {
-      console.log('Swipe blocked: animation in progress');
       return; // Prevent double swipes
     }
 
-    console.log('Starting swipe:', direction, 'isAnimating:', isAnimating);
     setIsAnimating(true);
     setSwipeDirection(direction);
+    setShowBackgroundCards(false); // Hide background cards immediately
 
     if (direction === 'right' && currentMovie) {
       // Add to watchlist
@@ -150,14 +150,18 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       setCurrentIndex(prev => prev + 1);
       setSwipeDirection(null);
       setIsAnimating(false);
-      console.log('Animation complete, isAnimating set to false');
+
+      // Delay showing background cards to ensure new positions are calculated
+      setTimeout(() => {
+        setShowBackgroundCards(true);
+      }, 50);
 
       // Fetch more when running low (append instead of replace)
       if (currentIndex >= movies.length - 5) {
         fetchMovies(true);
       }
     }, 400);
-  }, [isAnimating, currentMovie, currentIndex, x]);
+  }, [isAnimating, currentMovie, currentIndex, x, movies.length, fetchMovies]);
 
   const handleDragEnd = (event: any, info: PanInfo) => {
     const swipeVelocity = info.velocity.x;
@@ -183,20 +187,15 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      console.log('Key pressed:', e.key, 'isAnimating:', isAnimating, 'currentMovie:', !!currentMovie);
-
       if (!currentMovie || isAnimating) {
-        console.log('Ignoring key press - animating or no current movie');
         return;
       }
 
       switch (e.key) {
         case 'ArrowLeft':
-          console.log('Calling handleSwipe(left)');
           handleSwipe('left');
           break;
         case 'ArrowRight':
-          console.log('Calling handleSwipe(right)');
           handleSwipe('right');
           break;
         case 'ArrowUp':
@@ -206,10 +205,8 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       }
     };
 
-    console.log('Setting up keyboard listener, isAnimating:', isAnimating);
     window.addEventListener('keydown', handleKeyPress);
     return () => {
-      console.log('Removing keyboard listener');
       window.removeEventListener('keydown', handleKeyPress);
     };
   }, [currentMovie, isAnimating, handleSwipe, handleViewDetails]);
@@ -267,8 +264,8 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
 
       {/* Card Stack */}
       <div className="relative w-full aspect-[2/3]">
-        {/* Third card (background) - Hide during animation to prevent flashing */}
-        {thirdMovie && !isAnimating && (
+        {/* Third card (background) - Only show when animation is complete and delayed */}
+        {thirdMovie && showBackgroundCards && (
           <div
             className="absolute inset-0 w-full h-full"
             style={{
@@ -288,8 +285,8 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
           </div>
         )}
 
-        {/* Second card (middle) - Hide during animation to prevent flashing */}
-        {nextMovie && !isAnimating && (
+        {/* Second card (middle) - Only show when animation is complete and delayed */}
+        {nextMovie && showBackgroundCards && (
           <div
             className="absolute inset-0 w-full h-full"
             style={{
