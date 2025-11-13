@@ -85,15 +85,38 @@ export default function InstantSearch() {
 
       const data = await response.json();
 
-      // Filter and limit results
-      const filtered = data.results
-        .filter((item: SearchResult) =>
-          (item.media_type === 'movie' || item.media_type === 'tv' || item.media_type === 'person') &&
-          (item.poster_path || item.profile_path)
-        )
-        .slice(0, 8);
+      // Filter out items without images
+      const validResults = data.results.filter((item: SearchResult) =>
+        (item.media_type === 'movie' || item.media_type === 'tv' || item.media_type === 'person') &&
+        (item.poster_path || item.profile_path)
+      );
 
-      setResults(filtered);
+      // Separate by type for balanced results
+      const movies = validResults.filter((item: SearchResult) => item.media_type === 'movie');
+      const tvShows = validResults.filter((item: SearchResult) => item.media_type === 'tv');
+      const people = validResults.filter((item: SearchResult) => item.media_type === 'person');
+
+      // Create balanced result set: prioritize diversity
+      const balanced: SearchResult[] = [];
+
+      // Add top 4 movies
+      balanced.push(...movies.slice(0, 4));
+
+      // Add top 2 people (important for actor/director searches)
+      balanced.push(...people.slice(0, 2));
+
+      // Add top 2 TV shows
+      balanced.push(...tvShows.slice(0, 2));
+
+      // If we don't have 8 items, fill with remaining results
+      if (balanced.length < 8) {
+        const remaining = validResults
+          .filter((item: SearchResult) => !balanced.includes(item))
+          .slice(0, 8 - balanced.length);
+        balanced.push(...remaining);
+      }
+
+      setResults(balanced);
     } catch (error) {
       console.error('Search error:', error);
       setResults([]);
