@@ -4,29 +4,13 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Search, X, Clock, TrendingUp, Film, Tv, User } from 'lucide-react';
-
-interface SearchResult {
-  id: number;
-  title?: string;
-  name?: string;
-  media_type: 'movie' | 'tv' | 'person';
-  poster_path?: string;
-  profile_path?: string;
-  vote_average?: number;
-  first_air_date?: string;
-  release_date?: string;
-  known_for_department?: string;
-}
-
-interface RecentSearch {
-  query: string;
-  timestamp: number;
-}
+import { tmdbApi } from '@/lib/api/tmdb';
+import type { SearchResult } from '@/lib/types';
+import { useSearchStore } from '@/lib/store';
 
 export default function InstantSearch() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -37,24 +21,15 @@ export default function InstantSearch() {
   const debounceTimer = useRef<NodeJS.Timeout>();
   const router = useRouter();
 
+  // Use Zustand store for recent searches
+  const { recentSearches, addRecentSearch, clearRecentSearches } = useSearchStore();
+
   // Detect mobile on mount
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Load recent searches from localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem('recentSearches');
-    if (stored) {
-      try {
-        setRecentSearches(JSON.parse(stored));
-      } catch (e) {
-        console.error('Failed to parse recent searches', e);
-      }
-    }
   }, []);
 
   // Close dropdown when clicking outside
@@ -81,37 +56,29 @@ export default function InstantSearch() {
       setIsLoading(true);
 
       // Parallel searches to ensure we get all types of results
-      const [multiResponse, peopleResponse] = await Promise.all([
-        fetch(
-          `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${encodeURIComponent(searchQuery)}&page=1`
-        ),
-        fetch(
-          `https://api.themoviedb.org/3/search/person?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${encodeURIComponent(searchQuery)}&page=1`
-        )
-      ]);
-
       const [multiData, peopleData] = await Promise.all([
-        multiResponse.json(),
-        peopleResponse.json()
+        tmdbApi.search.multi(searchQuery, 1),
+        tmdbApi.search.people(searchQuery, 1),
       ]);
 
       // Filter multi search results (movies and TV shows)
-      const multiResults = multiData.results.filter((item: SearchResult) =>
-        (item.media_type === 'movie' || item.media_type === 'tv') &&
-        item.poster_path
+      const multiResults = multiData.results.filter(
+        (item) =>
+          (item.media_type === 'movie' || item.media_type === 'tv') &&
+          item.poster_path
       );
 
-      // Filter people results
+      // Filter people results and add media_type
       const peopleResults = peopleData.results
-        .filter((item: any) => item.profile_path)
-        .map((item: any) => ({
+        .filter((item) => item.profile_path)
+        .map((item) => ({
           ...item,
-          media_type: 'person'
+          media_type: 'person' as const,
         }));
 
       // Separate by type
-      const movies = multiResults.filter((item: SearchResult) => item.media_type === 'movie');
-      const tvShows = multiResults.filter((item: SearchResult) => item.media_type === 'tv');
+      const movies = multiResults.filter((item) => item.media_type === 'movie');
+      const tvShows = multiResults.filter((item) => item.media_type === 'tv');
 
       // Create balanced result set
       const balanced: SearchResult[] = [];
@@ -130,7 +97,7 @@ export default function InstantSearch() {
         const remaining = [
           ...movies.slice(4),
           ...tvShows.slice(2),
-          ...peopleResults.slice(2)
+          ...peopleResults.slice(2),
         ].slice(0, 8 - balanced.length);
         balanced.push(...remaining);
       }
@@ -168,28 +135,9 @@ export default function InstantSearch() {
     }
   };
 
-  // Save to recent searches
-  const saveRecentSearch = (searchQuery: string) => {
-    if (!searchQuery.trim()) return;
-
-    const newRecent: RecentSearch = {
-      query: searchQuery,
-      timestamp: Date.now()
-    };
-
-    // Remove duplicates and limit to 5
-    const updated = [
-      newRecent,
-      ...recentSearches.filter(r => r.query.toLowerCase() !== searchQuery.toLowerCase())
-    ].slice(0, 5);
-
-    setRecentSearches(updated);
-    localStorage.setItem('recentSearches', JSON.stringify(updated));
-  };
-
   // Handle result click
   const handleResultClick = (result: SearchResult) => {
-    saveRecentSearch(query);
+    addRecentSearch(query);
     setIsOpen(false);
     setQuery('');
 
@@ -205,12 +153,6 @@ export default function InstantSearch() {
     setQuery(recentQuery);
     performSearch(recentQuery);
     inputRef.current?.focus();
-  };
-
-  // Clear recent searches
-  const clearRecentSearches = () => {
-    setRecentSearches([]);
-    localStorage.removeItem('recentSearches');
   };
 
   // Keyboard navigation

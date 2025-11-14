@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Heart } from 'lucide-react';
-import { addToWatchlist, removeFromWatchlist, isInWatchlist, WatchlistItem } from '@/lib/collections';
+import { useWatchlistStore } from '@/lib/store';
 
 interface WatchlistButtonProps {
   item: {
@@ -17,12 +17,11 @@ interface WatchlistButtonProps {
 }
 
 export default function WatchlistButton({ item, size = 'md', showLabel = false }: WatchlistButtonProps) {
-  const [inWatchlist, setInWatchlist] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  useEffect(() => {
-    setInWatchlist(isInWatchlist(item.id, item.media_type));
-  }, [item.id, item.media_type]);
+  // Use Zustand store
+  const { addItem, removeItem, isInWatchlist } = useWatchlistStore();
+  const inWatchlist = isInWatchlist(item.id, item.media_type);
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -32,15 +31,9 @@ export default function WatchlistButton({ item, size = 'md', showLabel = false }
     setTimeout(() => setIsAnimating(false), 300);
 
     if (inWatchlist) {
-      removeFromWatchlist(item.id, item.media_type);
-      setInWatchlist(false);
+      removeItem(item.id, item.media_type);
     } else {
-      const watchlistItem: WatchlistItem = {
-        ...item,
-        addedAt: Date.now(),
-      };
-      addToWatchlist(watchlistItem);
-      setInWatchlist(true);
+      addItem(item);
     }
   };
 
