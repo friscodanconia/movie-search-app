@@ -3,6 +3,7 @@
 import React, { ReactNode } from 'react';
 import ErrorBoundary from './ErrorBoundary';
 import Header from './Header';
+import QueryProvider from './QueryProvider';
 
 interface ClientLayoutProps {
   children: ReactNode;
@@ -10,13 +11,15 @@ interface ClientLayoutProps {
 
 /**
  * Client-side layout wrapper
- * Wraps the app with ErrorBoundary for global error handling
+ * Wraps the app with QueryProvider for data caching and ErrorBoundary for global error handling
  */
 export default function ClientLayout({ children }: ClientLayoutProps) {
   return (
-    <ErrorBoundary>
-      <Header />
-      {children}
-    </ErrorBoundary>
+    <QueryProvider>
+      <ErrorBoundary>
+        <Header />
+        {children}
+      </ErrorBoundary>
+    </QueryProvider>
   );
 }

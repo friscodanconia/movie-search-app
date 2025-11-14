@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.90.8",
+    "@tanstack/react-query-devtools": "^5.90.2",
     "framer-motion": "^12.23.24",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.435.0",
