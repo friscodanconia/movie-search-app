@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { CURATED_COLLECTIONS, getWatchlist, WatchlistItem } from '@/lib/collections';
 import Image from 'next/image';
 import { ArrowLeft, Star } from 'lucide-react';
+import ErrorMessage from '@/components/ErrorMessage';
+import EmptyState from '@/components/EmptyState';
 
 interface Movie {
   id: number;
@@ -88,16 +90,14 @@ export default function CollectionDetailPage() {
 
   if (!collection) {
     return (
-      <div className="min-h-screen bg-cinema-dark flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-500 text-xl mb-4">Collection not found</p>
-          <button
-            onClick={() => router.push('/collections')}
-            className="text-cinema-gold hover:underline"
-          >
-            Back to Collections
-          </button>
-        </div>
+      <div className="min-h-screen bg-cinema-dark">
+        <ErrorMessage
+          title="Collection Not Found"
+          message="The collection you are looking for could not be found. It may have been removed or the link is incorrect."
+          onRetry={() => window.location.reload()}
+          onGoHome={() => router.push('/collections')}
+          showHomeButton
+        />
       </div>
     );
   }
@@ -133,19 +133,17 @@ export default function CollectionDetailPage() {
 
         {/* Movies Grid */}
         {movies.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-gray-400 text-lg mb-4">
-              {slug === 'watchlist'
-                ? 'Your watchlist is empty. Start adding movies!'
-                : 'No movies found in this collection.'}
-            </p>
-            <button
-              onClick={() => router.push('/')}
-              className="bg-cinema-gold text-cinema-dark px-6 py-3 rounded-full font-semibold hover:bg-yellow-500 transition-colors"
-            >
-              Discover Movies
-            </button>
-          </div>
+          <EmptyState
+            title={slug === 'watchlist' ? 'Your Watchlist is Empty' : 'No Movies in Collection'}
+            message={
+              slug === 'watchlist'
+                ? 'Start building your watchlist by adding movies and shows you want to watch!'
+                : 'This collection is currently empty. Check back later or explore other collections.'
+            }
+            icon={slug === 'watchlist' ? 'film' : 'search'}
+            actionLabel="Discover Movies"
+            onAction={() => router.push('/')}
+          />
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
             {movies.map((movie) => (

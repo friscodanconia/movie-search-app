@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import SearchBar from './SearchBarEnhanced';
 import SkeletonCard from './SkeletonCard';
 import AdvancedFilters, { FilterOptions } from './AdvancedFilters';
+import EmptyState from './EmptyState';
 
 interface Movie {
   id: number;
@@ -346,15 +347,13 @@ const MovieSearch: React.FC<MovieSearchProps> = ({ onSearchStateChange }) => {
       )}
       {error && <p className="text-center text-red-500 py-4">{error}</p>}
       {!isLoading && !error && hasSearched && visibleResults.length === 0 && searchTerm && (
-        <div className="text-center py-8">
-          <p className="text-cinema-text text-lg mb-4">No results found for &ldquo;{searchTerm}&rdquo;</p>
-          <button
-            onClick={handleClearSearch}
-            className="px-6 py-3 bg-cinema-gold text-cinema-dark rounded-full font-semibold hover:bg-yellow-500 transition-colors"
-          >
-            Clear Search
-          </button>
-        </div>
+        <EmptyState
+          title="No results found"
+          message={`We couldn't find anything matching "${searchTerm}". Try different keywords or clear your search to browse popular content.`}
+          icon="search"
+          actionLabel="Clear Search"
+          onAction={handleClearSearch}
+        />
       )}
 
       {/* Results Header */}
