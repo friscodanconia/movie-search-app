@@ -9,7 +9,7 @@ export default function Home() {
   const [isSearchActive, setIsSearchActive] = useState(false);
 
   return (
-    <main className="min-h-screen bg-cinema-dark">
+    <main id="main-content" className="min-h-screen bg-cinema-dark" role="main">
       {/* Hero Carousel - Hidden when searching */}
       {!isSearchActive && <HeroCarousel />}
 
