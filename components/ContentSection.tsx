@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { Star } from 'lucide-react';
+import OptimizedImage from './OptimizedImage';
 import WatchlistButton from './WatchlistButton';
 
 interface ContentItem {
@@ -78,7 +78,7 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
     <section className="mb-12">
       <h2 className="text-3xl font-bold text-cinema-gold mb-6">{title}</h2>
       <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-        {items.map((item) => (
+        {items.map((item, index) => (
           <div
             key={item.id}
             onClick={() => handleItemClick(item)}
@@ -86,12 +86,14 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
           >
             <div className="relative mb-2 rounded-lg overflow-hidden bg-gray-800 transition-all hover:ring-2 hover:ring-cinema-gold">
               {item.poster_path ? (
-                <Image
+                <OptimizedImage
                   src={`https://image.tmdb.org/t/p/w342${item.poster_path}`}
                   alt={item.title || item.name || 'Content'}
                   width={342}
                   height={513}
                   className="w-full h-auto"
+                  priority={index < 3}
+                  sizes="(max-width: 768px) 50vw, 25vw"
                 />
               ) : (
                 <div className="w-full aspect-[2/3] flex items-center justify-center bg-gray-700">
