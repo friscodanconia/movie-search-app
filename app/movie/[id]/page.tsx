@@ -9,6 +9,7 @@ import WatchlistButton from '@/components/WatchlistButton';
 import WatchProviders from '@/components/WatchProviders';
 import { fetchStreamingAvailability } from '@/lib/streamingAvailability';
 import { useSEO } from '@/lib/hooks/useSEO';
+import ErrorMessage from '@/components/ErrorMessage';
 
 interface Genre {
   id: number;
@@ -180,8 +181,18 @@ export default function MovieDetailPage() {
 
   if (error || !movie) {
     return (
-      <div className="min-h-screen bg-cinema-dark flex items-center justify-center">
-        <p className="text-red-500 text-xl">{error || 'Movie not found'}</p>
+      <div className="min-h-screen bg-cinema-dark">
+        <ErrorMessage
+          title={error ? 'Failed to Load Movie' : 'Movie Not Found'}
+          message={
+            error
+              ? 'We encountered an error while loading this movie. Please try again or go back to the home page.'
+              : 'The movie you are looking for could not be found. It may have been removed or the ID is incorrect.'
+          }
+          onRetry={() => window.location.reload()}
+          onGoHome={() => router.push('/')}
+          showHomeButton
+        />
       </div>
     );
   }
