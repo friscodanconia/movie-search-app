@@ -8,6 +8,7 @@ import VideoModal from '@/components/VideoModal';
 import WatchlistButton from '@/components/WatchlistButton';
 import WatchProviders from '@/components/WatchProviders';
 import { fetchStreamingAvailability } from '@/lib/streamingAvailability';
+import { useSEO } from '@/lib/hooks/useSEO';
 
 interface Genre {
   id: number;
@@ -72,6 +73,19 @@ export default function TVDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
+
+  // SEO: Update page metadata when TV show data is available
+  useSEO({
+    title: tvShow?.name || 'TV Show Details',
+    description: tvShow?.overview || 'Discover movies and TV shows',
+    image: tvShow?.backdrop_path
+      ? `https://image.tmdb.org/t/p/w1280${tvShow.backdrop_path}`
+      : tvShow?.poster_path
+      ? `https://image.tmdb.org/t/p/w780${tvShow.poster_path}`
+      : undefined,
+    url: typeof window !== 'undefined' ? window.location.href : undefined,
+    type: 'video.tv_show',
+  });
 
   useEffect(() => {
     const fetchTVDetails = async () => {
