@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { CURATED_COLLECTIONS, getWatchlist, WatchlistItem } from '@/lib/collections';
+import { CURATED_COLLECTIONS } from '@/lib/collections';
 import Image from 'next/image';
 import { ArrowLeft, Star } from 'lucide-react';
 import ErrorMessage from '@/components/ErrorMessage';
 import EmptyState from '@/components/EmptyState';
+import { useWatchlistStore } from '@/lib/store/useWatchlistStore';
 
 interface Movie {
   id: number;
@@ -26,6 +27,9 @@ export default function CollectionDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [collection, setCollection] = useState<any>(null);
 
+  // Get watchlist from Zustand store
+  const { items: watchlistItems } = useWatchlistStore();
+
   useEffect(() => {
     const fetchCollectionMovies = async () => {
       try {
@@ -33,7 +37,6 @@ export default function CollectionDetailPage() {
 
         // Handle watchlist separately
         if (slug === 'watchlist') {
-          const watchlistItems = getWatchlist();
           const moviePromises = watchlistItems.map(async (item) => {
             const response = await fetch(
               `https://api.themoviedb.org/3/${item.media_type}/${item.id}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
@@ -78,7 +81,7 @@ export default function CollectionDetailPage() {
     };
 
     fetchCollectionMovies();
-  }, [slug]);
+  }, [slug, watchlistItems]);
 
   if (isLoading) {
     return (
