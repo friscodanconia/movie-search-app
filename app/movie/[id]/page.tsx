@@ -8,6 +8,7 @@ import VideoModal from '@/components/VideoModal';
 import WatchlistButton from '@/components/WatchlistButton';
 import WatchProviders from '@/components/WatchProviders';
 import { fetchStreamingAvailability } from '@/lib/streamingAvailability';
+import { useSEO } from '@/lib/hooks/useSEO';
 
 interface Genre {
   id: number;
@@ -72,6 +73,19 @@ export default function MovieDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
 
+  // SEO: Update page metadata when movie data is available
+  useSEO({
+    title: movie?.title || 'Movie Details',
+    description: movie?.overview || 'Discover movies and TV shows',
+    image: movie?.backdrop_path
+      ? `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`
+      : movie?.poster_path
+      ? `https://image.tmdb.org/t/p/w780${movie.poster_path}`
+      : undefined,
+    url: typeof window !== 'undefined' ? window.location.href : undefined,
+    type: 'video.movie',
+  });
+
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
@@ -101,17 +115,34 @@ export default function MovieDetailPage() {
 
         // Extract India providers from TMDb
         if (providersData.results?.IN) {
-          setWatchProviders(providersData.results.IN);
+          const indiaProviders = providersData.results.IN;
+          const hasData = indiaProviders.flatrate || indiaProviders.rent || indiaProviders.buy;
+
+          if (hasData) {
+            console.log(`✅ [Watch Providers] TMDb has India data for "${movieData.title}"`);
+            setWatchProviders(indiaProviders);
+          } else {
+            console.log(`⚠️ [Watch Providers] TMDb has empty India data for "${movieData.title}"`);
+            console.log('🎬 [Watch Providers] Attempting fallback to Streaming Availability API...');
+            const fallbackData = await fetchStreamingAvailability(
+              movieData.title,
+              'movie',
+              'in'
+            );
+            if (fallbackData) {
+              setWatchProviders(fallbackData);
+            }
+          }
         } else {
           // Fallback: Try Streaming Availability API for India
-          console.log('TMDb has no India data, trying Streaming Availability API...');
+          console.log(`ℹ️ [Watch Providers] No TMDb data for "${movieData.title}" in India region`);
+          console.log('🎬 [Watch Providers] Attempting fallback to Streaming Availability API...');
           const fallbackData = await fetchStreamingAvailability(
             movieData.title,
             'movie',
             'in'
           );
           if (fallbackData) {
-            console.log('Found streaming data via Streaming Availability API');
             setWatchProviders(fallbackData);
           }
         }

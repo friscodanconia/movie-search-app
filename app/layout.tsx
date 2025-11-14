@@ -1,6 +1,6 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import Header from '../components/Header'
+import ClientLayout from '../components/ClientLayout'
 
 export const metadata: Metadata = {
   title: 'CineMagic - Discover Movies & TV Shows',
@@ -15,8 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans bg-cinema-dark text-cinema-text">
-        <Header />
-        {children}
+        <ClientLayout>
+          {children}
+        </ClientLayout>
       </body>
     </html>
   )

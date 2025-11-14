@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { Star } from 'lucide-react';
+import OptimizedImage from './OptimizedImage';
 import WatchlistButton from './WatchlistButton';
 
 interface ContentItem {
@@ -55,10 +55,19 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
     router.push(`/${type}/${item.id}`);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent, item: ContentItem) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleItemClick(item);
+    }
+  };
+
+  const sectionId = `section-${title.replace(/\s+/g, '-').toLowerCase()}`;
+
   if (isLoading) {
     return (
-      <section className="mb-12">
-        <h2 className="text-3xl font-bold text-cinema-gold mb-6">{title}</h2>
+      <section className="mb-12" aria-label={`${title} section`} aria-busy="true">
+        <h2 id={`section-${title.replace(/\s+/g, '-').toLowerCase()}`} className="text-3xl font-bold text-cinema-gold mb-6">{title}</h2>
         <div className="flex gap-4 overflow-x-auto pb-4">
           {[...Array(10)].map((_, i) => (
             <div key={i} className="flex-shrink-0 w-48">
@@ -75,23 +84,33 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
   }
 
   return (
-    <section className="mb-12">
-      <h2 className="text-3xl font-bold text-cinema-gold mb-6">{title}</h2>
-      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-        {items.map((item) => (
-          <div
+    <section className="mb-12" aria-labelledby={sectionId}>
+      <h2 id={sectionId} className="text-3xl font-bold text-cinema-gold mb-6">{title}</h2>
+      <div
+        className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide"
+        role="list"
+        aria-label={`${title} carousel`}
+      >
+        {items.map((item, index) => (
+          <article
             key={item.id}
+            role="listitem"
+            tabIndex={0}
             onClick={() => handleItemClick(item)}
-            className="flex-shrink-0 w-48 cursor-pointer group active:scale-95 transition-transform"
+            onKeyDown={(e) => handleKeyDown(e, item)}
+            className="flex-shrink-0 w-48 cursor-pointer group active:scale-95 transition-transform focus:outline-none focus:ring-2 focus:ring-cinema-gold focus:ring-offset-2 focus:ring-offset-cinema-dark rounded-lg"
+            aria-label={`${item.title || item.name}, rated ${item.vote_average.toFixed(1)} out of 10`}
           >
             <div className="relative mb-2 rounded-lg overflow-hidden bg-gray-800 transition-all hover:ring-2 hover:ring-cinema-gold">
               {item.poster_path ? (
-                <Image
+                <OptimizedImage
                   src={`https://image.tmdb.org/t/p/w342${item.poster_path}`}
                   alt={item.title || item.name || 'Content'}
                   width={342}
                   height={513}
                   className="w-full h-auto"
+                  priority={index < 3}
+                  sizes="(max-width: 768px) 50vw, 25vw"
                 />
               ) : (
                 <div className="w-full aspect-[2/3] flex items-center justify-center bg-gray-700">
@@ -122,7 +141,7 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
             <p className="text-cinema-text text-sm font-medium line-clamp-2">
               {item.title || item.name}
             </p>
-          </div>
+          </article>
         ))}
       </div>
 
