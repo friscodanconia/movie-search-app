@@ -102,17 +102,34 @@ export default function TVDetailPage() {
 
         // Extract India providers from TMDb
         if (providersData.results?.IN) {
-          setWatchProviders(providersData.results.IN);
+          const indiaProviders = providersData.results.IN;
+          const hasData = indiaProviders.flatrate || indiaProviders.rent || indiaProviders.buy;
+
+          if (hasData) {
+            console.log(`✅ [Watch Providers] TMDb has India data for "${tvData.name}"`);
+            setWatchProviders(indiaProviders);
+          } else {
+            console.log(`⚠️ [Watch Providers] TMDb has empty India data for "${tvData.name}"`);
+            console.log('🎬 [Watch Providers] Attempting fallback to Streaming Availability API...');
+            const fallbackData = await fetchStreamingAvailability(
+              tvData.name,
+              'tv',
+              'in'
+            );
+            if (fallbackData) {
+              setWatchProviders(fallbackData);
+            }
+          }
         } else {
           // Fallback: Try Streaming Availability API for India
-          console.log('TMDb has no India data, trying Streaming Availability API...');
+          console.log(`ℹ️ [Watch Providers] No TMDb data for "${tvData.name}" in India region`);
+          console.log('🎬 [Watch Providers] Attempting fallback to Streaming Availability API...');
           const fallbackData = await fetchStreamingAvailability(
             tvData.name,
             'tv',
             'in'
           );
           if (fallbackData) {
-            console.log('Found streaming data via Streaming Availability API');
             setWatchProviders(fallbackData);
           }
         }
