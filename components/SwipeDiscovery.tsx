@@ -108,8 +108,6 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
   const thirdMovie = movies[currentIndex + 2];
 
   const handleSwipe = (direction: 'left' | 'right') => {
-    setSwipeDirection(direction);
-
     if (direction === 'right' && currentMovie) {
       // Add to watchlist
       const watchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
@@ -127,17 +125,21 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       }
     }
 
+    setSwipeDirection(direction);
+
+    // Reset motion values immediately to prevent interference with exit animation
+    x.set(0);
+
     // Move to next card after animation completes
     setTimeout(() => {
       setCurrentIndex(prev => prev + 1);
       setSwipeDirection(null);
-      x.set(0);
 
       // Fetch more when running low
       if (currentIndex >= movies.length - 5) {
         fetchMovies();
       }
-    }, 250);
+    }, 220);
   };
 
   const handleDragEnd = (event: any, info: PanInfo) => {
@@ -282,27 +284,26 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
         )}
 
         {/* Top card (interactive) - animated */}
-        <AnimatePresence initial={false} mode="wait">
+        <AnimatePresence initial={false}>
           {currentMovie && (
             <motion.div
               key={`card-${currentIndex}`}
               className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
-              initial={{ scale: 1, opacity: 0 }}
+              initial={{ opacity: 0 }}
               animate={{
-                scale: 1,
                 opacity: 1,
-                transition: { duration: 0.2 }
+                transition: { duration: 0.15 }
               }}
               exit={{
                 x: swipeDirection === 'left' ? -400 : 400,
                 opacity: 0,
                 rotate: swipeDirection === 'left' ? -25 : 25,
-                transition: { duration: 0.2, ease: 'easeIn' }
+                transition: { duration: 0.18, ease: 'easeIn' }
               }}
               style={{
                 x,
                 rotate,
-                zIndex: 10
+                zIndex: swipeDirection ? 20 : 10
               }}
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
