@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
+import { motion, useMotionValue, useTransform, PanInfo, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { X, Heart, Info, RotateCcw, Star } from 'lucide-react';
@@ -37,7 +37,6 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
   const router = useRouter();
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-30, 30]);
-  const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0, 1, 1, 1, 0]);
   const skipOpacity = useTransform(x, [-200, -50, 0], [1, 0.5, 0]);
   const saveOpacity = useTransform(x, [0, 50, 200], [0, 0.5, 1]);
 
@@ -239,125 +238,163 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       {/* Card Stack */}
       <div className="relative w-full aspect-[2/3]">
         {/* Third card (background) */}
-        {thirdMovie && (
-          <div
-            className="absolute inset-0 w-full h-full"
-            style={{
-              transform: 'scale(0.88) translateY(20px)',
-              filter: 'brightness(0.6)',
-              zIndex: 1
-            }}
-          >
-            <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-800">
-              <Image
-                src={`https://image.tmdb.org/t/p/w500${thirdMovie.poster_path}`}
-                alt={getTitle(thirdMovie)}
-                fill
-                className="object-cover"
-              />
-            </div>
-          </div>
-        )}
+        <AnimatePresence initial={false}>
+          {thirdMovie && (
+            <motion.div
+              key={`card-${currentIndex + 2}`}
+              className="absolute inset-0 w-full h-full"
+              initial={{ scale: 0.82, y: 30, opacity: 0 }}
+              animate={{
+                scale: 0.88,
+                y: 20,
+                opacity: 1,
+                filter: 'brightness(0.6)',
+                transition: { duration: 0.3, ease: 'easeOut' }
+              }}
+              exit={{
+                scale: 0.94,
+                y: 10,
+                opacity: 1,
+                filter: 'brightness(0.8)',
+                transition: { duration: 0.3, ease: 'easeOut' }
+              }}
+              style={{ zIndex: 1 }}
+            >
+              <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-800">
+                <Image
+                  src={`https://image.tmdb.org/t/p/w500${thirdMovie.poster_path}`}
+                  alt={getTitle(thirdMovie)}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Second card (middle) */}
-        {nextMovie && (
-          <div
-            className="absolute inset-0 w-full h-full"
-            style={{
-              transform: 'scale(0.94) translateY(10px)',
-              filter: 'brightness(0.8)',
-              zIndex: 2
-            }}
-          >
-            <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-800">
-              <Image
-                src={`https://image.tmdb.org/t/p/w500${nextMovie.poster_path}`}
-                alt={getTitle(nextMovie)}
-                fill
-                className="object-cover"
-              />
-            </div>
-          </div>
-        )}
+        <AnimatePresence initial={false}>
+          {nextMovie && (
+            <motion.div
+              key={`card-${currentIndex + 1}`}
+              className="absolute inset-0 w-full h-full"
+              initial={{ scale: 0.88, y: 20, opacity: 0 }}
+              animate={{
+                scale: 0.94,
+                y: 10,
+                opacity: 1,
+                filter: 'brightness(0.8)',
+                transition: { duration: 0.3, ease: 'easeOut' }
+              }}
+              exit={{
+                scale: 1,
+                y: 0,
+                opacity: 1,
+                filter: 'brightness(1)',
+                transition: { duration: 0.3, ease: 'easeOut' }
+              }}
+              style={{ zIndex: 2 }}
+            >
+              <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-800">
+                <Image
+                  src={`https://image.tmdb.org/t/p/w500${nextMovie.poster_path}`}
+                  alt={getTitle(nextMovie)}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Top card (interactive) */}
-        {currentMovie && (
-          <motion.div
-            className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
-            style={{
-              x,
-              rotate,
-              opacity,
-              zIndex: 3
-            }}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            onDragEnd={handleDragEnd}
-            animate={swipeDirection ? {
-              x: swipeDirection === 'left' ? -500 : 500,
-              opacity: 0,
-              transition: { duration: 0.3 }
-            } : {}}
-          >
-            <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-900 shadow-2xl">
-              {/* Poster Image */}
-              <Image
-                src={`https://image.tmdb.org/t/p/w500${currentMovie.poster_path}`}
-                alt={getTitle(currentMovie)}
-                fill
-                className="object-cover"
-                priority
-              />
+        <AnimatePresence initial={false}>
+          {currentMovie && (
+            <motion.div
+              key={`card-${currentIndex}`}
+              className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
+              initial={{ scale: 0.94, y: 10, opacity: 0 }}
+              animate={{
+                scale: 1,
+                y: 0,
+                opacity: 1,
+                transition: { duration: 0.3, ease: 'easeOut' }
+              }}
+              exit={{
+                x: swipeDirection === 'left' ? -500 : 500,
+                opacity: 0,
+                rotate: swipeDirection === 'left' ? -30 : 30,
+                transition: { duration: 0.3, ease: 'easeIn' }
+              }}
+              style={{
+                x,
+                rotate,
+                zIndex: 3
+              }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              onDragEnd={handleDragEnd}
+            >
+              <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-900 shadow-2xl">
+                {/* Poster Image */}
+                <Image
+                  src={`https://image.tmdb.org/t/p/w500${currentMovie.poster_path}`}
+                  alt={getTitle(currentMovie)}
+                  fill
+                  className="object-cover"
+                  priority
+                />
 
-              {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
-              {/* Swipe Indicators */}
-              <motion.div
-                className="absolute top-8 left-8 bg-red-500 text-white px-6 py-3 rounded-full font-bold text-2xl rotate-[-20deg] border-4 border-red-500"
-                style={{
-                  opacity: skipOpacity
-                }}
-              >
-                SKIP
-              </motion.div>
-              <motion.div
-                className="absolute top-8 right-8 bg-green-500 text-white px-6 py-3 rounded-full font-bold text-2xl rotate-[20deg] border-4 border-green-500"
-                style={{
-                  opacity: saveOpacity
-                }}
-              >
-                SAVE
-              </motion.div>
+                {/* Swipe Indicators */}
+                <motion.div
+                  className="absolute top-8 left-8 bg-red-500 text-white px-6 py-3 rounded-full font-bold text-2xl rotate-[-20deg] border-4 border-red-500"
+                  style={{
+                    opacity: skipOpacity
+                  }}
+                >
+                  SKIP
+                </motion.div>
+                <motion.div
+                  className="absolute top-8 right-8 bg-green-500 text-white px-6 py-3 rounded-full font-bold text-2xl rotate-[20deg] border-4 border-green-500"
+                  style={{
+                    opacity: saveOpacity
+                  }}
+                >
+                  SAVE
+                </motion.div>
 
-              {/* Movie Info */}
-              <div className="absolute bottom-0 left-0 right-0 p-6">
-                <h2 className="text-3xl font-bold text-white mb-2">
-                  {getTitle(currentMovie)}
-                </h2>
-                <div className="flex items-center gap-3 text-white mb-3">
-                  <div className="flex items-center gap-1">
-                    <Star size={18} className="fill-cinema-gold text-cinema-gold" />
-                    <span className="font-semibold">{currentMovie.vote_average.toFixed(1)}</span>
+                {/* Movie Info */}
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h2 className="text-3xl font-bold text-white mb-2">
+                    {getTitle(currentMovie)}
+                  </h2>
+                  <div className="flex items-center gap-3 text-white mb-3">
+                    <div className="flex items-center gap-1">
+                      <Star size={18} className="fill-cinema-gold text-cinema-gold" />
+                      <span className="font-semibold">{currentMovie.vote_average.toFixed(1)}</span>
+                    </div>
+                    {getYear(currentMovie) && (
+                      <>
+                        <span>•</span>
+                        <span>{getYear(currentMovie)}</span>
+                      </>
+                    )}
+                    <span>•</span>
+                    <span className="uppercase text-sm">
+                      {currentMovie.media_type === 'movie' ? 'Movie' : 'TV Show'}
+                    </span>
                   </div>
-                  {getYear(currentMovie) && (
-                    <>
-                      <span>•</span>
-                      <span>{getYear(currentMovie)}</span>
-                    </>
-                  )}
-                  <span>•</span>
-                  <span className="uppercase text-sm">
-                    {currentMovie.media_type === 'movie' ? 'Movie' : 'TV Show'}
-                  </span>
+                  <p className="text-gray-300 text-sm line-clamp-3 mb-4">
+                    {currentMovie.overview}
+                  </p>
                 </div>
-                <p className="text-gray-300 text-sm line-clamp-3 mb-4">
-                  {currentMovie.overview}
-                </p>
               </div>
-            </div>
-          </motion.div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Action Buttons */}
