@@ -220,7 +220,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
   };
 
   return (
-    <div className="relative w-full max-w-md mx-auto" style={{ minHeight: '700px' }}>
+    <div className="relative w-full max-w-md mx-auto overflow-hidden" style={{ minHeight: '700px' }}>
       {/* Instructions */}
       <div className="text-center mb-6">
         <p className="text-cinema-text text-sm mb-2">
@@ -236,7 +236,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       </div>
 
       {/* Card Stack */}
-      <div className="relative w-full aspect-[2/3] overflow-hidden rounded-2xl">
+      <div className="relative w-full aspect-[2/3]">
         {/* Third card (background) */}
         <AnimatePresence initial={false}>
           {thirdMovie && (
