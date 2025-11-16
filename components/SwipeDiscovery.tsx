@@ -127,7 +127,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       }
     }
 
-    // Move to next card after animation
+    // Move to next card after animation completes
     setTimeout(() => {
       setCurrentIndex(prev => prev + 1);
       setSwipeDirection(null);
@@ -137,7 +137,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       if (currentIndex >= movies.length - 5) {
         fetchMovies();
       }
-    }, 300);
+    }, 350);
   };
 
   const handleDragEnd = (event: any, info: PanInfo) => {
@@ -324,7 +324,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
                 x: swipeDirection === 'left' ? -500 : 500,
                 opacity: 0,
                 rotate: swipeDirection === 'left' ? -30 : 30,
-                transition: { duration: 0.3, ease: 'easeIn' }
+                transition: { duration: 0.25, ease: 'easeIn' }
               }}
               style={{
                 x,
