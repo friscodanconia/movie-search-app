@@ -301,11 +301,11 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
                 transition: { duration: 0.18, ease: 'easeIn' }
               }}
               style={{
-                x,
-                rotate,
+                x: swipeDirection ? 0 : x,
+                rotate: swipeDirection ? 0 : rotate,
                 zIndex: swipeDirection ? 20 : 10
               }}
-              drag="x"
+              drag={swipeDirection ? false : "x"}
               dragConstraints={{ left: 0, right: 0 }}
               onDragEnd={handleDragEnd}
             >
