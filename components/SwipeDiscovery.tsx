@@ -236,7 +236,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       </div>
 
       {/* Card Stack */}
-      <div className="relative w-full aspect-[2/3]">
+      <div className="relative w-full aspect-[2/3] overflow-hidden rounded-2xl">
         {/* Third card (background) */}
         <AnimatePresence initial={false}>
           {thirdMovie && (
