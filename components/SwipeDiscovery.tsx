@@ -308,7 +308,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
         </AnimatePresence>
 
         {/* Top card (interactive) */}
-        <AnimatePresence initial={false}>
+        <AnimatePresence initial={false} mode="popLayout">
           {currentMovie && (
             <motion.div
               key={`card-${currentIndex}`}
@@ -329,7 +329,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
               style={{
                 x,
                 rotate,
-                zIndex: 3
+                zIndex: 10
               }}
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
