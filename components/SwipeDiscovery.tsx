@@ -137,7 +137,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       if (currentIndex >= movies.length - 5) {
         fetchMovies();
       }
-    }, 350);
+    }, 250);
   };
 
   const handleDragEnd = (event: any, info: PanInfo) => {
@@ -237,94 +237,67 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
 
       {/* Card Stack */}
       <div className="relative w-full aspect-[2/3]">
-        {/* Third card (background) */}
-        <AnimatePresence initial={false}>
-          {thirdMovie && (
-            <motion.div
-              key={`card-${currentIndex + 2}`}
-              className="absolute inset-0 w-full h-full"
-              initial={{ scale: 0.82, y: 30, opacity: 0 }}
-              animate={{
-                scale: 0.88,
-                y: 20,
-                opacity: 1,
-                filter: 'brightness(0.6)',
-                transition: { duration: 0.3, ease: 'easeOut' }
-              }}
-              exit={{
-                scale: 0.94,
-                y: 10,
-                opacity: 1,
-                filter: 'brightness(0.8)',
-                transition: { duration: 0.3, ease: 'easeOut' }
-              }}
-              style={{ zIndex: 1 }}
-            >
-              <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-800">
-                <Image
-                  src={`https://image.tmdb.org/t/p/w500${thirdMovie.poster_path}`}
-                  alt={getTitle(thirdMovie)}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Third card (background) - static, no animation */}
+        {thirdMovie && (
+          <div
+            key={`card-${currentIndex + 2}`}
+            className="absolute inset-0 w-full h-full"
+            style={{
+              transform: 'scale(0.88) translateY(20px)',
+              filter: 'brightness(0.6)',
+              zIndex: 1
+            }}
+          >
+            <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-800">
+              <Image
+                src={`https://image.tmdb.org/t/p/w500${thirdMovie.poster_path}`}
+                alt={getTitle(thirdMovie)}
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
+        )}
 
-        {/* Second card (middle) */}
-        <AnimatePresence initial={false}>
-          {nextMovie && (
-            <motion.div
-              key={`card-${currentIndex + 1}`}
-              className="absolute inset-0 w-full h-full"
-              initial={{ scale: 0.88, y: 20, opacity: 0 }}
-              animate={{
-                scale: 0.94,
-                y: 10,
-                opacity: 1,
-                filter: 'brightness(0.8)',
-                transition: { duration: 0.3, ease: 'easeOut' }
-              }}
-              exit={{
-                scale: 1,
-                y: 0,
-                opacity: 1,
-                filter: 'brightness(1)',
-                transition: { duration: 0.3, ease: 'easeOut' }
-              }}
-              style={{ zIndex: 2 }}
-            >
-              <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-800">
-                <Image
-                  src={`https://image.tmdb.org/t/p/w500${nextMovie.poster_path}`}
-                  alt={getTitle(nextMovie)}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Second card (middle) - static, no animation */}
+        {nextMovie && (
+          <div
+            key={`card-${currentIndex + 1}`}
+            className="absolute inset-0 w-full h-full"
+            style={{
+              transform: 'scale(0.94) translateY(10px)',
+              filter: 'brightness(0.8)',
+              zIndex: 2
+            }}
+          >
+            <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-800">
+              <Image
+                src={`https://image.tmdb.org/t/p/w500${nextMovie.poster_path}`}
+                alt={getTitle(nextMovie)}
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
+        )}
 
-        {/* Top card (interactive) */}
-        <AnimatePresence initial={false} mode="popLayout">
+        {/* Top card (interactive) - animated */}
+        <AnimatePresence initial={false} mode="wait">
           {currentMovie && (
             <motion.div
               key={`card-${currentIndex}`}
               className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
-              initial={{ scale: 0.94, y: 10, opacity: 0 }}
+              initial={{ scale: 1, opacity: 0 }}
               animate={{
                 scale: 1,
-                y: 0,
                 opacity: 1,
-                transition: { duration: 0.3, ease: 'easeOut' }
+                transition: { duration: 0.2 }
               }}
               exit={{
-                x: swipeDirection === 'left' ? -500 : 500,
+                x: swipeDirection === 'left' ? -400 : 400,
                 opacity: 0,
-                rotate: swipeDirection === 'left' ? -30 : 30,
-                transition: { duration: 0.25, ease: 'easeIn' }
+                rotate: swipeDirection === 'left' ? -25 : 25,
+                transition: { duration: 0.2, ease: 'easeIn' }
               }}
               style={{
                 x,
