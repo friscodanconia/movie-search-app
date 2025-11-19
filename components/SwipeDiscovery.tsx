@@ -31,6 +31,7 @@ const ROTATION_FACTOR = 0.1;
 export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }: SwipeDiscoveryProps) {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [displayIndex, setDisplayIndex] = useState(0); // Separate display index to prevent background cards from popping
   const [isLoading, setIsLoading] = useState(true);
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
 
@@ -104,9 +105,10 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
     }
   };
 
+  // Use displayIndex for background cards to prevent them from popping during transition
   const currentMovie = movies[currentIndex];
-  const nextMovie = movies[currentIndex + 1];
-  const thirdMovie = movies[currentIndex + 2];
+  const nextMovie = movies[displayIndex + 1];
+  const thirdMovie = movies[displayIndex + 2];
 
   const handleSwipe = (direction: 'left' | 'right') => {
     setSwipeDirection(direction);
@@ -128,9 +130,10 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       }
     }
 
-    // Move to next card after animation
+    // Move to next card after animation completes
     setTimeout(() => {
       setCurrentIndex(prev => prev + 1);
+      setDisplayIndex(prev => prev + 1); // Update display index to move background cards smoothly
       setSwipeDirection(null);
       x.set(0);
 
@@ -160,6 +163,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
 
   const handleReset = () => {
     setCurrentIndex(0);
+    setDisplayIndex(0);
     fetchMovies();
   };
 
