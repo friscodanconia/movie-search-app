@@ -108,12 +108,12 @@ export default function FilmArchiveSection({
       </h2>
 
       {/* Asymmetric Poster Wall */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6 auto-rows-max">
         {/* Featured Items - Larger */}
         {featuredItems.map((item, index) => (
           <motion.article
             key={item.id}
-            className={`${index === 0 ? 'md:col-span-2 md:row-span-2' : 'md:col-span-2'} cursor-pointer group`}
+            className={`${index === 0 ? 'md:col-span-2 md:row-span-2' : 'md:col-span-2 md:row-span-1'} cursor-pointer group`}
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
