@@ -363,7 +363,32 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
               </div>
             </div>
           </motion.div>
-        )}
+          )}
+          {/* Swiping out card */}
+          {currentMovie && swipeDirection && (
+            <motion.div
+              key={`${currentMovie.id}-swipe`}
+              className="absolute inset-0 w-full h-full"
+              style={{ zIndex: 3 }}
+              initial={{ opacity: 1, scale: 1 }}
+              animate={{
+                opacity: 0,
+                scale: 0.9,
+                transition: { duration: 0.2 }
+              }}
+            >
+              <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-900 shadow-2xl">
+                <Image
+                  src={`https://image.tmdb.org/t/p/w500${currentMovie.poster_path}`}
+                  alt={getTitle(currentMovie)}
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Action Buttons */}
