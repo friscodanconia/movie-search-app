@@ -32,9 +32,9 @@ const ROTATION_FACTOR = 0.1;
 export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }: SwipeDiscoveryProps) {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [displayIndex, setDisplayIndex] = useState(0); // Separate display index to prevent background cards from popping
   const [isLoading, setIsLoading] = useState(true);
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const router = useRouter();
   const x = useMotionValue(0);
@@ -106,13 +106,17 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
     }
   };
 
-  // Use displayIndex for background cards to prevent them from popping during transition
+  // Use isTransitioning to prevent background cards from updating during animation
+  const displayIndex = isTransitioning ? currentIndex - 1 : currentIndex;
   const currentMovie = movies[currentIndex];
   const nextMovie = movies[displayIndex + 1];
   const thirdMovie = movies[displayIndex + 2];
 
   const handleSwipe = (direction: 'left' | 'right') => {
+    if (isTransitioning) return; // Prevent multiple swipes during transition
+    
     setSwipeDirection(direction);
+    setIsTransitioning(true);
 
     if (direction === 'right' && currentMovie) {
       // Add to watchlist
@@ -135,12 +139,8 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
     setTimeout(() => {
       setCurrentIndex(prev => prev + 1);
       setSwipeDirection(null);
+      setIsTransitioning(false);
       x.set(0);
-
-      // Update display index slightly after to prevent background cards from popping
-      setTimeout(() => {
-        setDisplayIndex(prev => prev + 1);
-      }, 50);
 
       // Fetch more when running low
       if (currentIndex >= movies.length - 5) {
@@ -168,7 +168,8 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
 
   const handleReset = () => {
     setCurrentIndex(0);
-    setDisplayIndex(0);
+    setIsTransitioning(false);
+    setSwipeDirection(null);
     fetchMovies();
   };
 
