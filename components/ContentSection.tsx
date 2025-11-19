@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import OptimizedImage from './OptimizedImage';
 import WatchlistButton from './WatchlistButton';
@@ -29,13 +30,11 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        // Check if endpoint already has query parameters
         const separator = endpoint.includes('?') ? '&' : '?';
         const response = await fetch(
           `https://api.themoviedb.org/3${endpoint}${separator}api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
         );
         const data = await response.json();
-        // Filter out items without posters and with zero ratings
         const filteredResults = data.results
           .filter((item: ContentItem) => item.poster_path && item.vote_average > 0)
           .slice(0, 10);
@@ -67,15 +66,15 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
   if (isLoading) {
     return (
       <section className="mb-12" aria-label={`${title} section`} aria-busy="true">
-        <h2 id={`section-${title.replace(/\s+/g, '-').toLowerCase()}`} className="text-3xl font-bold text-cinema-gold mb-6">{title}</h2>
+        <h2 id={sectionId} className="text-3xl font-display font-medium text-cinema-accent mb-6 tracking-tight">{title}</h2>
         <div className="flex gap-4 overflow-x-auto pb-4">
           {[...Array(10)].map((_, i) => (
             <div key={i} className="flex-shrink-0 w-48">
-              <div className="relative aspect-[2/3] mb-2 rounded-lg overflow-hidden bg-gray-800">
-                <div className="w-full h-full bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 bg-[length:200%_100%] animate-shimmer"></div>
+              <div className="relative aspect-[2/3] mb-2 rounded-lg overflow-hidden bg-cinema-surface">
+                <div className="w-full h-full bg-gradient-to-r from-cinema-surface via-cinema-surface-hover to-cinema-surface bg-[length:200%_100%] animate-shimmer"></div>
               </div>
-              <div className="h-4 bg-gray-800 rounded w-3/4 mb-2 animate-pulse"></div>
-              <div className="h-3 bg-gray-800 rounded w-1/2 animate-pulse"></div>
+              <div className="h-4 bg-cinema-surface rounded w-3/4 mb-2 animate-pulse"></div>
+              <div className="h-3 bg-cinema-surface rounded w-1/2 animate-pulse"></div>
             </div>
           ))}
         </div>
@@ -84,48 +83,61 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
   }
 
   return (
-    <section className="mb-12" aria-labelledby={sectionId}>
-      <h2 id={sectionId} className="text-3xl font-bold text-cinema-gold mb-6">{title}</h2>
+    <motion.section 
+      className="mb-12" 
+      aria-labelledby={sectionId}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <h2 id={sectionId} className="text-3xl font-display font-medium text-cinema-accent mb-6 tracking-tight">
+        {title}
+      </h2>
       <div
         className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide"
         role="list"
         aria-label={`${title} carousel`}
       >
         {items.map((item, index) => (
-          <article
+          <motion.article
             key={item.id}
             role="listitem"
             tabIndex={0}
             onClick={() => handleItemClick(item)}
             onKeyDown={(e) => handleKeyDown(e, item)}
-            className="flex-shrink-0 w-48 cursor-pointer group active:scale-95 transition-transform focus:outline-none focus:ring-2 focus:ring-cinema-gold focus:ring-offset-2 focus:ring-offset-cinema-dark rounded-lg"
+            className="flex-shrink-0 w-48 cursor-pointer group"
             aria-label={`${item.title || item.name}, rated ${item.vote_average.toFixed(1)} out of 10`}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: index * 0.05, duration: 0.4 }}
+            whileHover={{ scale: 1.05, y: -4 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <div className="relative mb-2 rounded-lg overflow-hidden bg-gray-800 transition-all hover:ring-2 hover:ring-cinema-gold">
+            <div className="relative mb-2 rounded-lg overflow-hidden bg-cinema-surface transition-all group-hover:ring-2 group-hover:ring-cinema-accent group-hover:shadow-lg group-hover:shadow-cinema-accent/20">
               {item.poster_path ? (
                 <OptimizedImage
                   src={`https://image.tmdb.org/t/p/w342${item.poster_path}`}
                   alt={item.title || item.name || 'Content'}
                   width={342}
                   height={513}
-                  className="w-full h-auto"
+                  className="w-full h-auto transition-transform duration-300 group-hover:scale-105"
                   priority={index < 3}
                   sizes="(max-width: 768px) 50vw, 25vw"
                 />
               ) : (
-                <div className="w-full aspect-[2/3] flex items-center justify-center bg-gray-700">
-                  <span className="text-gray-500 text-4xl">🎬</span>
+                <div className="w-full aspect-[2/3] flex items-center justify-center bg-cinema-surface">
+                  <span className="text-cinema-text-dim text-4xl">🎬</span>
                 </div>
               )}
-              {/* Rating Badge */}
-              <div className="absolute top-2 right-2 bg-black bg-opacity-75 px-2 py-1 rounded flex items-center gap-1">
-                <Star size={14} className="fill-cinema-gold text-cinema-gold" />
-                <span className="text-white text-sm font-semibold">
+              {/* Rating Badge - Cinema Style */}
+              <div className="absolute top-2 right-2 bg-cinema-dark/90 backdrop-blur-sm px-2 py-1 rounded flex items-center gap-1 border border-cinema-border">
+                <Star size={14} className="fill-cinema-accent text-cinema-accent" />
+                <span className="text-cinema-text text-sm font-mono font-semibold">
                   {item.vote_average.toFixed(1)}
                 </span>
               </div>
-              {/* Watchlist Button - Shows on hover (desktop only) */}
-              <div className="absolute bottom-2 right-2 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none md:pointer-events-auto">
+              {/* Watchlist Button */}
+              <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none md:pointer-events-auto">
                 <WatchlistButton
                   item={{
                     id: item.id,
@@ -138,10 +150,10 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
                 />
               </div>
             </div>
-            <p className="text-cinema-text text-sm font-medium line-clamp-2">
+            <p className="text-cinema-text text-sm font-sans font-medium line-clamp-2 group-hover:text-cinema-accent transition-colors">
               {item.title || item.name}
             </p>
-          </article>
+          </motion.article>
         ))}
       </div>
 
@@ -154,6 +166,6 @@ export default function ContentSection({ title, endpoint, mediaType }: ContentSe
           scrollbar-width: none;
         }
       `}</style>
-    </section>
+    </motion.section>
   );
 }

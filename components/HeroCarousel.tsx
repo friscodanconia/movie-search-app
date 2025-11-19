@@ -104,27 +104,27 @@ export default function HeroCarousel() {
               <div className="absolute inset-0 flex items-end md:items-center pb-8 md:pb-0">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full">
                   <div className="max-w-2xl">
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-cinema-gold mb-3 md:mb-4 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-medium text-cinema-accent mb-3 md:mb-4 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] tracking-tight">
                       {movie.title}
                     </h1>
                     <div className="flex items-center gap-3 md:gap-4 mb-3 md:mb-4">
-                      <div className="flex items-center gap-1 bg-black/60 px-2 py-1 rounded">
-                        <span className="text-cinema-gold text-lg md:text-xl">⭐</span>
-                        <span className="text-cinema-text text-base md:text-lg font-semibold">
+                      <div className="flex items-center gap-1 bg-cinema-dark/80 backdrop-blur-sm px-2 py-1 rounded border border-cinema-border">
+                        <span className="text-cinema-accent text-lg md:text-xl">⭐</span>
+                        <span className="text-cinema-text text-base md:text-lg font-mono font-semibold">
                           {movie.vote_average.toFixed(1)}
                         </span>
                       </div>
-                      <span className="text-gray-300 text-base md:text-lg font-medium bg-black/60 px-2 py-1 rounded">
+                      <span className="text-cinema-text-dim text-base md:text-lg font-mono font-medium bg-cinema-dark/80 backdrop-blur-sm px-2 py-1 rounded border border-cinema-border">
                         {new Date(movie.release_date).getFullYear()}
                       </span>
                     </div>
-                    <p className="hidden md:block text-cinema-text text-base md:text-lg mb-6 line-clamp-3 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                    <p className="hidden md:block text-cinema-text-dim text-base md:text-lg mb-6 line-clamp-3 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] font-sans leading-relaxed">
                       {movie.overview}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                       <button
                         onClick={() => router.push(`/movie/${movie.id}`)}
-                        className="flex items-center justify-center gap-2 bg-cinema-gold text-cinema-dark px-6 py-3 md:py-3 rounded-full font-semibold hover:bg-yellow-500 transition-colors shadow-lg min-h-[48px]"
+                        className="flex items-center justify-center gap-2 bg-cinema-accent text-cinema-dark px-6 py-3 md:py-3 rounded-full font-sans font-semibold hover:bg-cinema-accent-dim transition-all shadow-lg shadow-cinema-accent/30 hover:shadow-xl hover:shadow-cinema-accent/40 min-h-[48px] hover:scale-105 active:scale-95"
                       >
                         <Info size={20} />
                         <span>More Info</span>
@@ -139,9 +139,9 @@ export default function HeroCarousel() {
                               setTrailerKey(trailer.key);
                             }
                           }}
-                          className="flex items-center justify-center gap-2 bg-gray-700/90 backdrop-blur-sm text-white px-6 py-3 md:py-3 rounded-full font-semibold hover:bg-gray-600 transition-colors shadow-lg min-h-[48px]"
+                          className="flex items-center justify-center gap-2 bg-cinema-surface/90 backdrop-blur-sm text-cinema-text px-6 py-3 md:py-3 rounded-full font-sans font-semibold hover:bg-cinema-surface-hover transition-all shadow-lg border border-cinema-border hover:border-cinema-accent min-h-[48px] hover:scale-105 active:scale-95"
                         >
-                          <Play size={20} className="fill-white" />
+                          <Play size={20} className="fill-cinema-text" />
                           <span>Watch Trailer</span>
                         </button>
                       )}
@@ -167,22 +167,30 @@ export default function HeroCarousel() {
         .swiper-pagination-bullet {
           width: 10px;
           height: 10px;
-          background: rgba(255, 255, 255, 0.6);
+          background: rgba(255, 255, 255, 0.4);
           opacity: 1;
+          border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .swiper-pagination-bullet-active {
-          background: #FFD700;
+          background: var(--cinema-accent);
           width: 12px;
           height: 12px;
+          border-color: var(--cinema-accent);
         }
         .swiper-button-next,
         .swiper-button-prev {
-          color: #FFD700;
-          background: rgba(0, 0, 0, 0.7);
-          backdrop-filter: blur(4px);
+          color: var(--cinema-accent);
+          background: rgba(26, 26, 26, 0.8);
+          backdrop-filter: blur(8px);
           width: 40px;
           height: 40px;
           border-radius: 50%;
+          border: 1px solid var(--cinema-border);
+        }
+        .swiper-button-next:hover,
+        .swiper-button-prev:hover {
+          background: rgba(26, 26, 26, 0.95);
+          border-color: var(--cinema-accent);
         }
         @media (min-width: 768px) {
           .swiper-button-next,

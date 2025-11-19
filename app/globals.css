@@ -3,36 +3,130 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  /* Film Noir Elegance Theme */
+  --cinema-dark: #1A1A1A;
+  --cinema-surface: #2A2A2A;
+  --cinema-surface-hover: #333333;
+  --cinema-accent: #FFD700;
+  --cinema-accent-dim: #FFE55C;
+  --cinema-text: #F5F5F5;
+  --cinema-text-dim: #B8B8B8;
+  --cinema-border: #404040;
+  
+  /* Cinema Red for highlights */
+  --cinema-red: #DC143C;
+  --cinema-red-dim: #FF1744;
+  
+  /* Projector light effect */
+  --projector-light: rgba(255, 215, 0, 0.08);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+@layer base {
+  body {
+    @apply bg-cinema-dark text-cinema-text;
+    background-image: 
+      /* Projector light radial gradient */
+      radial-gradient(circle at 50% 0%, var(--projector-light) 0%, transparent 50%),
+      /* Film grain texture */
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255, 255, 255, 0.01) 2px,
+        rgba(255, 255, 255, 0.01) 4px
+      ),
+      /* Base color */
+      var(--cinema-dark);
+    background-size: 100% 100%, 100% 4px, 100% 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-}
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display), serif;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
-}
-@layer base {
-  body {
-    @apply bg-cinema-dark text-cinema-text;
+  
+  /* Cinematic animations */
+  @keyframes curtain-rise {
+    from {
+      opacity: 0;
+      transform: translateY(100%) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
+  
+  @keyframes film-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes projector-focus {
+    0%, 100% {
+      transform: scale(1);
+      filter: brightness(1);
+    }
+    50% {
+      transform: scale(1.02);
+      filter: brightness(1.1);
+    }
+  }
+  
+  .animate-curtain-rise {
+    animation: curtain-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  
+  .animate-film-fade {
+    animation: film-fade-in 0.6s ease-in-out forwards;
+  }
+  
+  .animate-projector-focus {
+    animation: projector-focus 3s ease-in-out infinite;
+  }
+  
+  /* Stagger delays for cascade effect */
+  .stagger-1 { animation-delay: 100ms; }
+  .stagger-2 { animation-delay: 200ms; }
+  .stagger-3 { animation-delay: 300ms; }
+  .stagger-4 { animation-delay: 400ms; }
+  .stagger-5 { animation-delay: 500ms; }
+}
+
+/* Custom scrollbar - cinema style */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cinema-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cinema-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cinema-accent);
+}
+
+/* Selection styling */
+::selection {
+  background: var(--cinema-accent);
+  color: var(--cinema-dark);
 }
