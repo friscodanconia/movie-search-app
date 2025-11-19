@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+// Fixed: Background cards now update smoothly without popping
 import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
