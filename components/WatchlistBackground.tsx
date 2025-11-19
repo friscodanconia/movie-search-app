@@ -17,9 +17,12 @@ export default function WatchlistBackground({ className = '', children }: Watchl
     .filter(item => item.poster_path)
     .slice(0, 6)
     .map(item => ({
-      url: `https://image.tmdb.org/t/p/w300${item.poster_path}`,
+      url: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
       id: `${item.id}-${item.media_type}`
     }));
+
+  // Debug: log if we have posters
+  console.log('WatchlistBackground: items count', items.length, 'posters count', posters.length);
 
   // Determine grid layout based on number of posters
   const getGridCols = () => {
@@ -41,14 +44,14 @@ export default function WatchlistBackground({ className = '', children }: Watchl
     <div className={`relative overflow-hidden rounded-lg ${className}`}>
       {/* Poster Grid Background */}
       {posters.length > 0 ? (
-        <div className={`absolute inset-0 grid ${getGridCols()} ${getGridRows()} opacity-30`}>
+        <div className={`absolute inset-0 grid ${getGridCols()} ${getGridRows()}`}>
           {posters.map((poster, index) => (
             <div key={poster.id} className="relative overflow-hidden">
               <Image
                 src={poster.url}
                 alt=""
                 fill
-                className="object-cover"
+                className="object-cover opacity-50"
                 sizes="(max-width: 768px) 50vw, 33vw"
                 unoptimized
               />
@@ -60,11 +63,11 @@ export default function WatchlistBackground({ className = '', children }: Watchl
         <div className="absolute inset-0 bg-gradient-to-r from-cinema-gold/20 to-yellow-600/20" />
       )}
 
-      {/* Dark overlay gradient for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-br from-cinema-dark/85 via-cinema-dark/75 to-cinema-dark/65" />
+      {/* Dark overlay gradient for text readability - lighter so posters show through */}
+      <div className="absolute inset-0 bg-gradient-to-br from-cinema-dark/70 via-cinema-dark/60 to-cinema-dark/50" />
       
-      {/* Additional overlay for better text contrast */}
-      <div className="absolute inset-0 bg-gradient-to-t from-cinema-dark/60 via-transparent to-cinema-dark/40" />
+      {/* Additional overlay for better text contrast - lighter */}
+      <div className="absolute inset-0 bg-gradient-to-t from-cinema-dark/50 via-transparent to-cinema-dark/30" />
       
       {/* Content wrapper - relative positioning for text */}
       <div className="relative z-10">
