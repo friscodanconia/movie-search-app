@@ -11,8 +11,16 @@ interface WatchlistBackgroundProps {
 export default function WatchlistBackground({ className = '', children }: WatchlistBackgroundProps) {
   const { items } = useWatchlistStore();
   
-  // Get up to 6 posters for the composite
-  const posters = items
+  // Default placeholder posters if watchlist is empty
+  const defaultPosters = [
+    'https://image.tmdb.org/t/p/w500/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg', // Popular movie poster
+    'https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg', // Popular movie poster
+    'https://image.tmdb.org/t/p/w500/kDp1vUBnMpe8ak4rjgl3cLELqjU.jpg', // Popular movie poster
+    'https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61eNJ22LqMfqN.jpg', // Popular movie poster
+  ];
+
+  // Get up to 6 posters for the composite, or use defaults if empty
+  const userPosters = items
     .filter(item => item.poster_path)
     .slice(0, 6)
     .map(item => ({
@@ -20,8 +28,12 @@ export default function WatchlistBackground({ className = '', children }: Watchl
       id: `${item.id}-${item.media_type}`
     }));
 
-  // Debug: log if we have posters
-  console.log('WatchlistBackground: items count', items.length, 'posters count', posters.length);
+  const posters = userPosters.length > 0 
+    ? userPosters 
+    : defaultPosters.map((url, index) => ({
+        url,
+        id: `default-${index}`
+      }));
 
   // Determine grid layout based on number of posters
   const getGridCols = () => {
