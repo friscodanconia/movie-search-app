@@ -63,11 +63,11 @@ export default function WatchlistBackground({ className = '', children }: Watchl
         <div className="absolute inset-0 bg-gradient-to-r from-cinema-gold/20 to-yellow-600/20" />
       )}
 
-      {/* Dark overlay gradient for text readability - lighter so posters show through */}
-      <div className="absolute inset-0 bg-gradient-to-br from-cinema-dark/70 via-cinema-dark/60 to-cinema-dark/50" />
+      {/* Dark overlay gradient for text readability - much lighter so posters show through */}
+      <div className="absolute inset-0 bg-gradient-to-br from-cinema-dark/50 via-cinema-dark/40 to-cinema-dark/30" />
       
-      {/* Additional overlay for better text contrast - lighter */}
-      <div className="absolute inset-0 bg-gradient-to-t from-cinema-dark/50 via-transparent to-cinema-dark/30" />
+      {/* Additional overlay for better text contrast - very light */}
+      <div className="absolute inset-0 bg-gradient-to-t from-cinema-dark/40 via-transparent to-cinema-dark/20" />
       
       {/* Content wrapper - relative positioning for text */}
       <div className="relative z-10">
