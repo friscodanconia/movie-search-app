@@ -133,9 +133,13 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
     // Move to next card after animation completes
     setTimeout(() => {
       setCurrentIndex(prev => prev + 1);
-      setDisplayIndex(prev => prev + 1); // Update display index to move background cards smoothly
       setSwipeDirection(null);
       x.set(0);
+
+      // Update display index slightly after to prevent background cards from popping
+      setTimeout(() => {
+        setDisplayIndex(prev => prev + 1);
+      }, 50);
 
       // Fetch more when running low
       if (currentIndex >= movies.length - 5) {
