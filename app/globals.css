@@ -104,6 +104,33 @@
   .stagger-3 { animation-delay: 300ms; }
   .stagger-4 { animation-delay: 400ms; }
   .stagger-5 { animation-delay: 500ms; }
+  
+  /* Film strip perforation pattern */
+  .film-strip-divider {
+    position: relative;
+    height: 2px;
+    background: var(--cinema-border);
+  }
+  
+  .film-strip-divider::before,
+  .film-strip-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    background: var(--cinema-border);
+    border-radius: 50%;
+  }
+  
+  .film-strip-divider::before {
+    left: 0;
+  }
+  
+  .film-strip-divider::after {
+    right: 0;
+  }
 }
 
 /* Custom scrollbar - cinema style */
