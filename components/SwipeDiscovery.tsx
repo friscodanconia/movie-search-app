@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 // Fixed: Background cards now update smoothly without popping
-import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
+import { motion, useMotionValue, useTransform, PanInfo, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { X, Heart, Info, RotateCcw, Star } from 'lucide-react';
@@ -282,24 +282,29 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
         )}
 
         {/* Top card (interactive) */}
-        {currentMovie && (
-          <motion.div
-            className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
-            style={{
-              x,
-              rotate,
-              opacity,
-              zIndex: 3
-            }}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            onDragEnd={handleDragEnd}
-            animate={swipeDirection ? {
-              x: swipeDirection === 'left' ? -500 : 500,
-              opacity: 0,
-              transition: { duration: 0.3 }
-            } : {}}
-          >
+        <AnimatePresence mode="wait">
+          {currentMovie && !swipeDirection && (
+            <motion.div
+              key={currentMovie.id}
+              className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
+              style={{
+                x,
+                rotate,
+                opacity,
+                zIndex: 3
+              }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              onDragEnd={handleDragEnd}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                x: 0,
+                transition: { duration: 0.2 }
+              }}
+              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+            >
             <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-900 shadow-2xl">
               {/* Poster Image */}
               <Image
