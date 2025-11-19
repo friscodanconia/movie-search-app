@@ -129,17 +129,15 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
       }
     }
 
-    // Move to next card after animation
-    setTimeout(() => {
-      setCurrentIndex(prev => prev + 1);
-      setSwipeDirection(null);
-      x.set(0);
+    // Instant swap - no delay
+    setCurrentIndex(prev => prev + 1);
+    setSwipeDirection(null);
+    x.set(0);
 
-      // Fetch more when running low
-      if (currentIndex >= movies.length - 5) {
-        fetchMovies();
-      }
-    }, 300);
+    // Fetch more when running low
+    if (currentIndex >= movies.length - 5) {
+      fetchMovies();
+    }
   };
 
   const handleDragEnd = (event: any, info: PanInfo) => {
@@ -281,30 +279,21 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
           </div>
         )}
 
-        {/* Top card (interactive) */}
-        <AnimatePresence mode="wait">
-          {currentMovie && !swipeDirection && (
-            <motion.div
-              key={currentMovie.id}
-              className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
-              style={{
-                x,
-                rotate,
-                opacity,
-                zIndex: 3
-              }}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              onDragEnd={handleDragEnd}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                x: 0,
-                transition: { duration: 0.2 }
-              }}
-              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-            >
+        {/* Top card (interactive) - Option 2: Instant Swap (no animation) */}
+        {currentMovie && (
+          <motion.div
+            key={currentMovie.id}
+            className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
+            style={{
+              x,
+              rotate,
+              opacity,
+              zIndex: 3
+            }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            onDragEnd={handleDragEnd}
+          >
             <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-900 shadow-2xl">
               {/* Poster Image */}
               <Image
@@ -363,32 +352,7 @@ export default function SwipeDiscovery({ initialType = 'mixed', region = 'IN' }:
               </div>
             </div>
           </motion.div>
-          )}
-          {/* Swiping out card */}
-          {currentMovie && swipeDirection && (
-            <motion.div
-              key={`${currentMovie.id}-swipe`}
-              className="absolute inset-0 w-full h-full"
-              style={{ zIndex: 3 }}
-              initial={{ opacity: 1, scale: 1 }}
-              animate={{
-                opacity: 0,
-                scale: 0.9,
-                transition: { duration: 0.2 }
-              }}
-            >
-              <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-900 shadow-2xl">
-                <Image
-                  src={`https://image.tmdb.org/t/p/w500${currentMovie.poster_path}`}
-                  alt={getTitle(currentMovie)}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        )}
       </div>
 
       {/* Action Buttons */}
