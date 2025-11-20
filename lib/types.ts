@@ -175,6 +175,15 @@ export interface Person {
   tv_credits?: TVCreditsResponse;
 }
 
+export interface PersonListItem {
+  id: number;
+  name: string;
+  profile_path: string | null;
+  known_for_department: string;
+  popularity: number;
+  known_for?: Array<MovieListItem | TVShowListItem>;
+}
+
 export interface CastMember {
   id: number;
   name: string;
@@ -347,6 +356,59 @@ export interface TMDbError {
   status_code: number;
   status_message: string;
   success: false;
+}
+
+// =============================================================================
+// Cinema DNA - Film Journal & Mood Tracking
+// =============================================================================
+
+export type MoodTag =
+  | 'euphoric'
+  | 'melancholic'
+  | 'tense'
+  | 'contemplative'
+  | 'nostalgic'
+  | 'uplifting'
+  | 'dark'
+  | 'whimsical'
+  | 'intense'
+  | 'peaceful';
+
+export interface JournalEntry {
+  id: string;
+  movieId: number;
+  title: string;
+  poster_path: string | null;
+  watchedAt: number;
+  rating?: number;
+  mood: MoodTag[];
+  emotionalNotes: string;
+  memoryAnchor?: string; // "Watched with Sarah on rainy Sunday"
+  rewatchCount: number;
+  context?: string; // Theater, Home, Flight, etc.
+}
+
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  progress: number;
+  total: number;
+  completed: boolean;
+  type: 'director' | 'decade' | 'genre' | 'collection' | 'milestone';
+  badge?: string;
+  movies: number[]; // TMDb IDs of movies in this challenge
+}
+
+export interface UserCinemaDNA {
+  dominantMoods: { mood: MoodTag; count: number }[];
+  favoriteDecades: { decade: string; count: number }[];
+  totalWatched: number;
+  avgRating: number;
+  rewatchChampion?: { title: string; count: number };
+  currentStreak: number;
+  longestStreak: number;
 }
 
 // =============================================================================

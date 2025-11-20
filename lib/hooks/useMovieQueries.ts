@@ -17,53 +17,53 @@ import type {
  */
 export const queryKeys = {
   movie: {
-    all: ['movies'] as const,
-    detail: (id: number) => [...queryKeys.movie.all, 'detail', id] as const,
-    similar: (id: number) => [...queryKeys.movie.all, 'similar', id] as const,
-    popular: (page: number) => [...queryKeys.movie.all, 'popular', page] as const,
-    topRated: (page: number) => [...queryKeys.movie.all, 'topRated', page] as const,
-    upcoming: (page: number) => [...queryKeys.movie.all, 'upcoming', page] as const,
-    nowPlaying: (page: number) => [...queryKeys.movie.all, 'nowPlaying', page] as const,
+    all: ['movies'],
+    detail: (id: number) => ['movies', 'detail', id],
+    similar: (id: number) => ['movies', 'similar', id],
+    popular: (page: number) => ['movies', 'popular', page],
+    topRated: (page: number) => ['movies', 'topRated', page],
+    upcoming: (page: number) => ['movies', 'upcoming', page],
+    nowPlaying: (page: number) => ['movies', 'nowPlaying', page],
   },
   tv: {
-    all: ['tv'] as const,
-    detail: (id: number) => [...queryKeys.tv.all, 'detail', id] as const,
-    similar: (id: number) => [...queryKeys.tv.all, 'similar', id] as const,
-    popular: (page: number) => [...queryKeys.tv.all, 'popular', page] as const,
-    topRated: (page: number) => [...queryKeys.tv.all, 'topRated', page] as const,
+    all: ['tv'],
+    detail: (id: number) => ['tv', 'detail', id],
+    similar: (id: number) => ['tv', 'similar', id],
+    popular: (page: number) => ['tv', 'popular', page],
+    topRated: (page: number) => ['tv', 'topRated', page],
   },
   person: {
-    all: ['people'] as const,
-    detail: (id: number) => [...queryKeys.person.all, 'detail', id] as const,
-    popular: (page: number) => [...queryKeys.person.all, 'popular', page] as const,
+    all: ['people'],
+    detail: (id: number) => ['people', 'detail', id],
+    popular: (page: number) => ['people', 'popular', page],
   },
   search: {
-    all: ['search'] as const,
-    multi: (query: string, page: number) => [...queryKeys.search.all, 'multi', query, page] as const,
-    movies: (query: string, page: number) => [...queryKeys.search.all, 'movies', query, page] as const,
-    tv: (query: string, page: number) => [...queryKeys.search.all, 'tv', query, page] as const,
-    people: (query: string, page: number) => [...queryKeys.search.all, 'people', query, page] as const,
+    all: ['search'],
+    multi: (query: string, page: number) => ['search', 'multi', query, page],
+    movies: (query: string, page: number) => ['search', 'movies', query, page],
+    tv: (query: string, page: number) => ['search', 'tv', query, page],
+    people: (query: string, page: number) => ['search', 'people', query, page],
   },
   discover: {
-    all: ['discover'] as const,
-    movies: (params: string) => [...queryKeys.discover.all, 'movies', params] as const,
-    tv: (params: string) => [...queryKeys.discover.all, 'tv', params] as const,
+    all: ['discover'],
+    movies: (params: string) => ['discover', 'movies', params],
+    tv: (params: string) => ['discover', 'tv', params],
   },
   trending: {
-    all: ['trending'] as const,
+    all: ['trending'],
     movies: (timeWindow: 'day' | 'week', page: number) =>
-      [...queryKeys.trending.all, 'movies', timeWindow, page] as const,
+      ['trending', 'movies', timeWindow, page],
     tv: (timeWindow: 'day' | 'week', page: number) =>
-      [...queryKeys.trending.all, 'tv', timeWindow, page] as const,
-    all: (timeWindow: 'day' | 'week', page: number) =>
-      [...queryKeys.trending.all, 'all', timeWindow, page] as const,
+      ['trending', 'tv', timeWindow, page],
+    allMedia: (timeWindow: 'day' | 'week', page: number) =>
+      ['trending', 'all', timeWindow, page],
   },
 };
 
 /**
  * Hook: Fetch movie details by ID
  */
-export function useMovieDetails(movieId: number, options?: UseQueryOptions<Movie>) {
+export function useMovieDetails(movieId: number, options?: Omit<UseQueryOptions<Movie>, 'queryKey' | 'queryFn'>) {
   return useQuery<Movie>({
     queryKey: queryKeys.movie.detail(movieId),
     queryFn: () => movieApi.getDetails(movieId),
@@ -78,7 +78,7 @@ export function useMovieDetails(movieId: number, options?: UseQueryOptions<Movie
 export function useSimilarMovies(
   movieId: number,
   page = 1,
-  options?: UseQueryOptions<PaginatedResponse<MovieListItem>>
+  options?: Omit<UseQueryOptions<PaginatedResponse<MovieListItem>>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<PaginatedResponse<MovieListItem>>({
     queryKey: queryKeys.movie.similar(movieId),
@@ -91,7 +91,7 @@ export function useSimilarMovies(
 /**
  * Hook: Fetch TV show details by ID
  */
-export function useTVShowDetails(tvId: number, options?: UseQueryOptions<TVShow>) {
+export function useTVShowDetails(tvId: number, options?: Omit<UseQueryOptions<TVShow>, 'queryKey' | 'queryFn'>) {
   return useQuery<TVShow>({
     queryKey: queryKeys.tv.detail(tvId),
     queryFn: () => tvApi.getDetails(tvId),
@@ -106,7 +106,7 @@ export function useTVShowDetails(tvId: number, options?: UseQueryOptions<TVShow>
 export function useSimilarTVShows(
   tvId: number,
   page = 1,
-  options?: UseQueryOptions<PaginatedResponse<TVShowListItem>>
+  options?: Omit<UseQueryOptions<PaginatedResponse<TVShowListItem>>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<PaginatedResponse<TVShowListItem>>({
     queryKey: queryKeys.tv.similar(tvId),
@@ -119,7 +119,7 @@ export function useSimilarTVShows(
 /**
  * Hook: Fetch person details by ID
  */
-export function usePersonDetails(personId: number, options?: UseQueryOptions<Person>) {
+export function usePersonDetails(personId: number, options?: Omit<UseQueryOptions<Person>, 'queryKey' | 'queryFn'>) {
   return useQuery<Person>({
     queryKey: queryKeys.person.detail(personId),
     queryFn: () => personApi.getDetails(personId),
@@ -133,7 +133,7 @@ export function usePersonDetails(personId: number, options?: UseQueryOptions<Per
  */
 export function usePopularMovies(
   page = 1,
-  options?: UseQueryOptions<PaginatedResponse<MovieListItem>>
+  options?: Omit<UseQueryOptions<PaginatedResponse<MovieListItem>>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<PaginatedResponse<MovieListItem>>({
     queryKey: queryKeys.movie.popular(page),
@@ -147,7 +147,7 @@ export function usePopularMovies(
  */
 export function useTopRatedMovies(
   page = 1,
-  options?: UseQueryOptions<PaginatedResponse<MovieListItem>>
+  options?: Omit<UseQueryOptions<PaginatedResponse<MovieListItem>>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<PaginatedResponse<MovieListItem>>({
     queryKey: queryKeys.movie.topRated(page),
@@ -162,7 +162,7 @@ export function useTopRatedMovies(
 export function useMultiSearch(
   query: string,
   page = 1,
-  options?: UseQueryOptions<PaginatedResponse<SearchResult>>
+  options?: Omit<UseQueryOptions<PaginatedResponse<SearchResult>>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<PaginatedResponse<SearchResult>>({
     queryKey: queryKeys.search.multi(query, page),
@@ -178,7 +178,7 @@ export function useMultiSearch(
 export function useSearchMovies(
   query: string,
   page = 1,
-  options?: UseQueryOptions<PaginatedResponse<MovieListItem>>
+  options?: Omit<UseQueryOptions<PaginatedResponse<MovieListItem>>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<PaginatedResponse<MovieListItem>>({
     queryKey: queryKeys.search.movies(query, page),
@@ -194,11 +194,11 @@ export function useSearchMovies(
 export function useTrendingMovies(
   timeWindow: 'day' | 'week' = 'week',
   page = 1,
-  options?: UseQueryOptions<PaginatedResponse<MovieListItem>>
+  options?: Omit<UseQueryOptions<PaginatedResponse<MovieListItem>>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<PaginatedResponse<MovieListItem>>({
     queryKey: queryKeys.trending.movies(timeWindow, page),
-    queryFn: () => trendingApi.getMovies(timeWindow, page),
+    queryFn: () => trendingApi.getMovies(timeWindow),
     ...options,
   });
 }
@@ -209,11 +209,11 @@ export function useTrendingMovies(
 export function useTrendingTV(
   timeWindow: 'day' | 'week' = 'week',
   page = 1,
-  options?: UseQueryOptions<PaginatedResponse<TVShowListItem>>
+  options?: Omit<UseQueryOptions<PaginatedResponse<TVShowListItem>>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<PaginatedResponse<TVShowListItem>>({
     queryKey: queryKeys.trending.tv(timeWindow, page),
-    queryFn: () => trendingApi.getTV(timeWindow, page),
+    queryFn: () => trendingApi.getTVShows(timeWindow),
     ...options,
   });
 }
@@ -224,13 +224,13 @@ export function useTrendingTV(
 export function useDiscoverMovies(
   params: Record<string, any> = {},
   page = 1,
-  options?: UseQueryOptions<PaginatedResponse<MovieListItem>>
+  options?: Omit<UseQueryOptions<PaginatedResponse<MovieListItem>>, 'queryKey' | 'queryFn'>
 ) {
   const paramsKey = JSON.stringify({ ...params, page });
 
   return useQuery<PaginatedResponse<MovieListItem>>({
     queryKey: queryKeys.discover.movies(paramsKey),
-    queryFn: () => discoverApi.discoverMovies({ ...params, page }),
+    queryFn: () => discoverApi.movies({ ...params, page }),
     ...options,
   });
 }
@@ -241,13 +241,13 @@ export function useDiscoverMovies(
 export function useDiscoverTV(
   params: Record<string, any> = {},
   page = 1,
-  options?: UseQueryOptions<PaginatedResponse<TVShowListItem>>
+  options?: Omit<UseQueryOptions<PaginatedResponse<TVShowListItem>>, 'queryKey' | 'queryFn'>
 ) {
   const paramsKey = JSON.stringify({ ...params, page });
 
   return useQuery<PaginatedResponse<TVShowListItem>>({
     queryKey: queryKeys.discover.tv(paramsKey),
-    queryFn: () => discoverApi.discoverTV({ ...params, page }),
+    queryFn: () => discoverApi.tvShows({ ...params, page }),
     ...options,
   });
 }
