@@ -7,6 +7,7 @@ import { Star, Play, ArrowLeft, Calendar, Clock } from 'lucide-react';
 import VideoModal from '@/components/VideoModal';
 import WatchlistButton from '@/components/WatchlistButton';
 import WatchProviders from '@/components/WatchProviders';
+import JournalButton from '@/components/JournalButton';
 import { fetchStreamingAvailability } from '@/lib/streamingAvailability';
 import { useSEO } from '@/lib/hooks/useSEO';
 import ErrorMessage from '@/components/ErrorMessage';
@@ -249,6 +250,13 @@ export default function MovieDetailPage() {
                   Watch Trailer
                 </button>
               )}
+              <JournalButton
+                movie={{
+                  id: movie.id,
+                  title: movie.title,
+                  poster_path: movie.poster_path,
+                }}
+              />
               <WatchlistButton
                 item={{
                   id: movie.id,

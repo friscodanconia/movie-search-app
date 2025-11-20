@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Film, Library, Sparkles } from 'lucide-react';
+import { Film, Library, Sparkles, Dna, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import InstantSearch from './InstantSearch';
 
@@ -19,8 +19,8 @@ export default function Header() {
         Skip to main content
       </a>
 
-      <header 
-        className="sticky top-0 z-50 bg-cinema-dark/95 backdrop-blur-md border-b border-cinema-border shadow-lg" 
+      <header
+        className="sticky top-0 z-50 glass border-b border-cinema-border shadow-lg"
         role="banner"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
@@ -34,8 +34,10 @@ export default function Header() {
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2 }}
             >
-              <Film className="w-7 h-7 sm:w-8 sm:h-8 text-cinema-accent group-hover:text-cinema-accent-dim transition-colors" aria-hidden="true" />
-              <h1 className="text-xl sm:text-2xl font-display font-medium text-cinema-accent group-hover:text-cinema-accent-dim transition-colors tracking-tight hidden sm:block">
+              <div className="relative">
+                <Film className="w-7 h-7 sm:w-8 sm:h-8 text-[#00f5ff] group-hover:neon-glow-cyan transition-all" aria-hidden="true" />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-display font-semibold gradient-text tracking-tight hidden sm:block">
                 CineMagic
               </h1>
             </motion.button>
@@ -54,7 +56,7 @@ export default function Header() {
 
               <motion.button
                 onClick={() => router.push('/discover')}
-                className="flex items-center gap-1.5 sm:gap-2 text-cinema-text hover:text-cinema-accent transition-colors text-xs sm:text-sm font-sans font-medium focus:outline-none focus:ring-2 focus:ring-cinema-accent focus:ring-offset-2 focus:ring-offset-cinema-dark rounded"
+                className="flex items-center gap-1.5 sm:gap-2 text-cinema-text hover:text-[#a855f7] transition-all text-xs sm:text-sm font-sans font-medium focus:outline-none focus:ring-2 focus:ring-[#a855f7] rounded px-3 py-2 hover:bg-white/5 ripple"
                 aria-label="Discover movies and shows"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -66,7 +68,7 @@ export default function Header() {
 
               <motion.button
                 onClick={() => router.push('/collections')}
-                className="flex items-center gap-1.5 sm:gap-2 text-cinema-text hover:text-cinema-accent transition-colors text-xs sm:text-sm font-sans font-medium focus:outline-none focus:ring-2 focus:ring-cinema-accent focus:ring-offset-2 focus:ring-offset-cinema-dark rounded"
+                className="flex items-center gap-1.5 sm:gap-2 text-cinema-text hover:text-[#ec4899] transition-all text-xs sm:text-sm font-sans font-medium focus:outline-none focus:ring-2 focus:ring-[#ec4899] rounded px-3 py-2 hover:bg-white/5 ripple"
                 aria-label="Browse collections"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -76,14 +78,29 @@ export default function Header() {
                 <span className="sr-only sm:hidden">Collections</span>
               </motion.button>
 
-              <a
-                href="https://www.themoviedb.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-cinema-text-dim hover:text-cinema-accent transition-colors text-xs sm:text-sm font-mono font-medium hidden lg:block"
+              <motion.button
+                onClick={() => router.push('/challenges')}
+                className="flex items-center gap-1.5 sm:gap-2 text-cinema-text hover:text-[#fbbf24] transition-all text-xs sm:text-sm font-sans font-medium focus:outline-none focus:ring-2 focus:ring-[#fbbf24] rounded px-3 py-2 hover:bg-white/5 ripple"
+                aria-label="Cinema challenges"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <span className="hidden xl:inline">Powered by </span>TMDb
-              </a>
+                <Trophy className="w-5 h-5 sm:w-5 sm:h-5" aria-hidden="true" />
+                <span className="hidden lg:inline">Challenges</span>
+                <span className="sr-only lg:hidden">Challenges</span>
+              </motion.button>
+
+              <motion.button
+                onClick={() => router.push('/dna')}
+                className="flex items-center gap-1.5 sm:gap-2 text-cinema-text hover:text-[#00f5ff] transition-all text-xs sm:text-sm font-sans font-medium focus:outline-none focus:ring-2 focus:ring-[#00f5ff] rounded px-3 py-2 hover:bg-white/5 ripple"
+                aria-label="Your Cinema DNA"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Dna className="w-5 h-5 sm:w-5 sm:h-5" aria-hidden="true" />
+                <span className="hidden lg:inline">DNA</span>
+                <span className="sr-only lg:hidden">DNA</span>
+              </motion.button>
             </nav>
           </div>
         </div>
