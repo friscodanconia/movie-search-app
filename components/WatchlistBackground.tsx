@@ -52,17 +52,18 @@ export default function WatchlistBackground({ className = '', children }: Watchl
   };
 
   return (
-    <div className={`relative overflow-hidden rounded-lg min-h-[200px] ${className}`}>
+    <div className={`relative overflow-hidden rounded-lg min-h-[280px] ${className}`}>
       {/* Poster Grid Background */}
       {posters.length > 0 ? (
-        <div className={`absolute inset-0 grid ${getGridCols()} ${getGridRows()} gap-0 z-0`}>
+        <div className={`absolute inset-0 grid ${getGridCols()} ${getGridRows()} gap-0`}>
           {posters.map((poster, index) => (
-            <div key={poster.id} className="relative overflow-hidden w-full h-full">
+            <div key={poster.id} className="relative overflow-hidden w-full h-full min-h-[140px]">
               <img
                 src={poster.url}
                 alt=""
-                className="w-full h-full object-cover opacity-60"
+                className="w-full h-full object-cover opacity-80"
                 style={{ display: 'block' }}
+                loading="eager"
               />
             </div>
           ))}
@@ -72,11 +73,11 @@ export default function WatchlistBackground({ className = '', children }: Watchl
         <div className="absolute inset-0 bg-gradient-to-r from-cinema-gold/30 via-yellow-600/30 to-cinema-gold/30" />
       )}
 
-      {/* Dark overlay gradient for text readability - lighter so posters show through */}
-      <div className="absolute inset-0 bg-gradient-to-br from-cinema-dark/70 via-cinema-dark/50 to-transparent z-[1]" />
+      {/* Subtle overlay gradient for text readability - much lighter on right side */}
+      <div className="absolute inset-0 bg-gradient-to-br from-cinema-dark/60 via-cinema-dark/30 to-cinema-dark/10" />
 
-      {/* Additional overlay for better text contrast - very light */}
-      <div className="absolute inset-0 bg-gradient-to-t from-cinema-dark/40 via-transparent to-transparent z-[2]" />
+      {/* Bottom text contrast overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-cinema-dark/50 via-transparent to-transparent" />
       
       {/* Content wrapper - relative positioning for text */}
       <div className="relative z-10">
