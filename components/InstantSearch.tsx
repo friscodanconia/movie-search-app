@@ -204,6 +204,7 @@ export default function InstantSearch() {
   };
 
   const showDropdown = isOpen && (query.trim() || recentSearches.length > 0);
+  const showMobileModal = isMobile && isOpen;
 
   return (
     <div ref={searchRef} className="relative w-full max-w-2xl">
@@ -241,16 +242,14 @@ export default function InstantSearch() {
       <button
         onClick={() => setIsOpen(true)}
         className="md:hidden text-cinema-text hover:text-cinema-gold transition-colors p-2"
+        aria-label="Open search"
       >
         <Search size={20} />
       </button>
 
-      {/* Results Dropdown/Modal */}
-      {showDropdown && (
-        <>
-          {/* Mobile: Full-screen overlay */}
-          {isMobile && (
-            <div className="fixed inset-0 bg-cinema-dark z-50 overflow-y-auto">
+      {/* Mobile: Full-screen Modal */}
+      {showMobileModal && (
+        <div className="fixed inset-0 bg-cinema-dark z-50 overflow-y-auto">
               <div className="sticky top-0 bg-cinema-dark border-b border-gray-800 p-4">
                 <div className="relative">
                   <Search
@@ -372,12 +371,21 @@ export default function InstantSearch() {
                     <p>No results found for &quot;{query}&quot;</p>
                   </div>
                 )}
+
+                {/* Empty State - No query and no recent searches */}
+                {!query && recentSearches.length === 0 && (
+                  <div className="text-center py-12 text-gray-400">
+                    <Search size={48} className="mx-auto mb-4 opacity-50" />
+                    <p className="text-lg font-medium">Search for movies, shows & people</p>
+                    <p className="text-sm mt-2">Start typing to see results</p>
+                  </div>
+                )}
               </div>
             </div>
-          )}
+      )}
 
-          {/* Desktop: Dropdown */}
-          {!isMobile && (
+      {/* Desktop: Dropdown */}
+      {showDropdown && !isMobile && (
             <div className="absolute top-full mt-2 w-full bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl max-h-[600px] overflow-y-auto z-50">
               {/* Recent Searches */}
               {!query && recentSearches.length > 0 && (
@@ -476,8 +484,6 @@ export default function InstantSearch() {
                 </div>
               )}
             </div>
-          )}
-        </>
       )}
     </div>
   );
