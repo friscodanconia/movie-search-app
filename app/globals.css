@@ -10,6 +10,13 @@
   --cinema-surface: rgba(20, 20, 30, 0.6);
   --cinema-surface-hover: rgba(30, 30, 50, 0.8);
 
+  /* Primary Accent */
+  --cinema-accent: #00f5ff;
+  --cinema-accent-dim: #00b8c4;
+  --cinema-gold: #fbbf24;
+  --cinema-red: #ef4444;
+  --cinema-red-dim: #dc2626;
+
   /* Neon Accents - Vibrant & Modern */
   --neon-cyan: #00f5ff;
   --neon-magenta: #ff00ff;

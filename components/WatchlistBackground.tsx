@@ -52,10 +52,10 @@ export default function WatchlistBackground({ className = '', children }: Watchl
   };
 
   return (
-    <div className={`relative overflow-hidden rounded-lg ${className}`}>
+    <div className={`relative overflow-hidden rounded-lg min-h-[200px] ${className}`}>
       {/* Poster Grid Background */}
       {posters.length > 0 ? (
-        <div className={`absolute inset-0 grid ${getGridCols()} ${getGridRows()} gap-0`}>
+        <div className={`absolute inset-0 grid ${getGridCols()} ${getGridRows()} gap-0 z-0`}>
           {posters.map((poster, index) => (
             <div key={poster.id} className="relative overflow-hidden w-full h-full">
               <img
@@ -73,10 +73,10 @@ export default function WatchlistBackground({ className = '', children }: Watchl
       )}
 
       {/* Dark overlay gradient for text readability - lighter so posters show through */}
-      <div className="absolute inset-0 bg-gradient-to-br from-cinema-dark/40 via-cinema-dark/30 to-cinema-dark/20" />
-      
+      <div className="absolute inset-0 bg-gradient-to-br from-cinema-dark/70 via-cinema-dark/50 to-transparent z-[1]" />
+
       {/* Additional overlay for better text contrast - very light */}
-      <div className="absolute inset-0 bg-gradient-to-t from-cinema-dark/30 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-cinema-dark/40 via-transparent to-transparent z-[2]" />
       
       {/* Content wrapper - relative positioning for text */}
       <div className="relative z-10">
