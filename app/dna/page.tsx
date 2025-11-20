@@ -41,7 +41,7 @@ export default function CinemaDNAPage() {
             Start logging movies in your journal to unlock your personalized cinema insights!
           </p>
           <Link
-            href="/"
+            href="/discover"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 neon-glow-purple font-bold"
           >
             <Film className="w-5 h-5" />

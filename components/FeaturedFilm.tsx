@@ -141,7 +141,7 @@ export default function FeaturedFilm() {
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <motion.button
                   onClick={() => router.push(`/movie/${movie.id}`)}
-                  className="flex items-center justify-center gap-3 bg-cinema-accent text-cinema-dark px-8 py-4 rounded-lg font-sans font-semibold text-lg hover:bg-cinema-accent-dim transition-all shadow-lg shadow-cinema-accent/30"
+                  className="flex items-center justify-center gap-3 bg-cinema-accent text-cinema-dark px-8 py-4 rounded-lg font-sans font-semibold text-lg hover:bg-cinema-accent-dim hover:shadow-2xl hover:shadow-cinema-accent/50 transition-all neon-glow-cyan"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -151,7 +151,7 @@ export default function FeaturedFilm() {
                 {trailer && (
                   <motion.button
                     onClick={() => setTrailerKey(trailer.key)}
-                    className="flex items-center justify-center gap-3 bg-cinema-surface/90 backdrop-blur-sm text-cinema-text px-8 py-4 rounded-lg font-sans font-semibold text-lg border border-cinema-border hover:border-cinema-accent transition-all"
+                    className="flex items-center justify-center gap-3 glass text-cinema-text px-8 py-4 rounded-lg font-sans font-semibold text-lg border border-cinema-border hover:border-[#a855f7] hover:shadow-lg hover:shadow-[#a855f7]/30 transition-all"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
