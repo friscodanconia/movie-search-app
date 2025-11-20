@@ -48,7 +48,7 @@ export function useTMDbEndpoint<T = any>(
 export function useTMDbContent(
   endpoint: string,
   limit = 10,
-  options?: Omit<UseQueryOptions<any[]>, 'queryKey' | 'queryFn'>
+  options?: Omit<UseQueryOptions<{ results: any[] }>, 'queryKey' | 'queryFn'>
 ) {
   const query = useTMDbEndpoint<{ results: any[] }>(endpoint, {}, options);
 
