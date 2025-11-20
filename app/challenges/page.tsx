@@ -191,7 +191,7 @@ export default function ChallengesPage() {
               {completedCount === 1 ? '1 Challenge Completed!' : `${completedCount} Challenges Completed!`}
             </h2>
             <p className="text-cinema-text-dim">
-              You're building an impressive cinematic foundation. Keep watching! 🎬
+              You&apos;re building an impressive cinematic foundation. Keep watching! 🎬
             </p>
           </motion.div>
         )}
